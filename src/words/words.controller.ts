@@ -7,6 +7,11 @@ import { UpdateWordDto } from './dto/update-word.dto';
 export class WordsController {
   constructor(private readonly wordsService: WordsService) {}
 
+  @Get('/membean')
+  getMembeanWords(){
+    return this.wordsService.getMembeanWords();
+  }
+
   @Post()
   create(@Body() createWordDto: CreateWordDto) {
     return this.wordsService.create(createWordDto);

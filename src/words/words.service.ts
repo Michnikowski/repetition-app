@@ -1,9 +1,62 @@
 import { Injectable } from '@nestjs/common';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
+import * as puppeteer from 'puppeteer';
+import { GetMembeanWordsResponse } from './dto/membean.dto';
 
 @Injectable()
 export class WordsService {
+
+  async getMembeanWords(): Promise<object[]> {
+
+    const browser: puppeteer.Browser = await puppeteer.launch({
+      headless: false,
+      slowMo: 500,
+      devtools: true,
+    });
+
+    const page: puppeteer.Page = await browser.newPage();
+    await page.goto('https://membean.com/treelist');
+    await page.waitForSelector('#treelist');
+
+    const rootFormCount: number = await page.evaluate(() => {
+      //return Promise.resolve (document.getElementsByClassName('rootform').length)
+      return 5
+    })
+
+    const rootForms = await page.$$(`span.rootform > a`);
+
+    const membeanWords: GetMembeanWordsResponse = [];
+
+    for( let i: number = 0; i < rootFormCount; i++ ) {
+
+      await rootForms[i].click({delay: 2000});
+      await page.waitForSelector('#treepanel');
+
+      await page.once('response', async (response) => {
+
+        const dataObject = await response.json()
+
+        let rootForm: string = dataObject.data.drootform;
+        let meaning: string = dataObject.data.meaning;
+        let leafs: object[] = dataObject.data.leafs;
+
+        membeanWords.push({
+            order: i + 1,
+            root: rootForm,
+            meaning: meaning,
+            leafs: leafs
+        })
+      });
+
+      await page.click('#sb-nav-close')
+    }
+
+    await browser.close();
+
+    return membeanWords;
+  }
+
   create(createWordDto: CreateWordDto) {
     return 'This action adds a new word';
   }
