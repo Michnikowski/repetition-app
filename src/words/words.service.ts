@@ -4,7 +4,6 @@ import { UpdateWordDto } from './dto/update-word.dto';
 import * as puppeteer from 'puppeteer';
 import { GetMembeanWordsResponse } from './dto/membean.dto';
 import { RootWord } from './entities/root-word.entity';
-import { Connection } from 'typeorm';
 import { RootMemberWord } from './entities/root-member-word.entity';
 
 @Injectable()
@@ -14,7 +13,7 @@ export class WordsService {
 
     const browser: puppeteer.Browser = await puppeteer.launch({
       headless: false,
-      slowMo: 500,
+      slowMo: 200,
       devtools: true,
     });
 
@@ -22,36 +21,36 @@ export class WordsService {
     await page.goto('https://membean.com/treelist');
     await page.waitForSelector('#treelist');
 
-    const rootFormCount: number = await page.evaluate(() => {
-      //return Promise.resolve (document.getElementsByClassName('rootform').length)
-      return 10
-    })
-
     const rootForms = await page.$$(`span.rootform > a`);
 
     const membeanWords: GetMembeanWordsResponse = [];
 
-    for( let i: number = 0; i < rootFormCount; i++ ) {
+    for ( const rootForm of rootForms ) {
 
-      await rootForms[i].click({delay: 2000});
-      await page.waitForSelector('#treepanel');
+      try {
+        await rootForm.click({ delay: 300 });
+        await page.waitForSelector('#treepanel');
 
-      await page.once('response', async (response) => {
+        await page.once('response', async (response) => {
 
-        const dataObject = await response.json()
+          const dataObject = await response.json()
 
-        let rootForm: string = dataObject.data.drootform;
-        let meaning: string = dataObject.data.meaning;
-        let leafs: object[] = dataObject.data.leafs;
+          let rootForm: string = dataObject.data.drootform;
+          let meaning: string = dataObject.data.meaning;
+          let leafs: object[] = dataObject.data.leafs;
 
-        membeanWords.push({
+          membeanWords.push({
             root: rootForm,
             meaning: meaning,
             leafs: leafs
-        })
-      });
+          })
+        });
 
-      await page.click('#sb-nav-close')
+        await page.click('#sb-nav-close')
+
+      } catch(e) {
+        console.log(e.message);
+      }
     }
 
     await browser.close();
