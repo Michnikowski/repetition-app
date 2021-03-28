@@ -55,7 +55,7 @@ export class WordsService {
 
     await browser.close();
 
-    for (let rootWordItem in membeanWords) {
+    for ( let rootWordItem in membeanWords ) {
 
       let { root, meaning, leafs } = membeanWords[rootWordItem];
 
