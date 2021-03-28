@@ -1,5 +1,4 @@
 export class MembeanWord {
-  order: number;
   root:  string;
   meaning:  string;
   leafs: object;

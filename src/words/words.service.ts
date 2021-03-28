@@ -3,6 +3,9 @@ import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 import * as puppeteer from 'puppeteer';
 import { GetMembeanWordsResponse } from './dto/membean.dto';
+import { RootWord } from './entities/root-word.entity';
+import { Connection } from 'typeorm';
+import { RootMemberWord } from './entities/root-member-word.entity';
 
 @Injectable()
 export class WordsService {
@@ -21,7 +24,7 @@ export class WordsService {
 
     const rootFormCount: number = await page.evaluate(() => {
       //return Promise.resolve (document.getElementsByClassName('rootform').length)
-      return 5
+      return 10
     })
 
     const rootForms = await page.$$(`span.rootform > a`);
@@ -42,7 +45,6 @@ export class WordsService {
         let leafs: object[] = dataObject.data.leafs;
 
         membeanWords.push({
-            order: i + 1,
             root: rootForm,
             meaning: meaning,
             leafs: leafs
@@ -53,6 +55,45 @@ export class WordsService {
     }
 
     await browser.close();
+
+    for (let rootWordItem in membeanWords) {
+
+      let { root, meaning, leafs } = membeanWords[rootWordItem];
+
+      const rootWord = new RootWord();
+      const wordExistInDB = await RootWord.findOne({name: root} )
+
+      if (!wordExistInDB) {
+        rootWord.name = root;
+        rootWord.meaning = meaning;
+
+        try {
+          await rootWord.save();
+        } catch(e) {
+          console.log(e.message);
+        }
+      }
+
+      for (let leaf in leafs) {
+
+        let { inlist, wordform, meaning } = leafs[leaf];
+        const wordExistInDB = await RootMemberWord.findOne({name: wordform} )
+
+        if (!wordExistInDB) {
+          const rootMemberWord = new RootMemberWord();
+          rootMemberWord.name = wordform;
+          rootMemberWord.definition = meaning;
+          rootMemberWord.inlist = inlist;
+          rootMemberWord.rootWord = rootWord;
+
+          try {
+            await rootMemberWord.save();
+          } catch(e) {
+            console.log(e.message);
+          }
+        }
+      }
+    }
 
     return membeanWords;
   }

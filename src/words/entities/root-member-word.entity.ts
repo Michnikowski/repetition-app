@@ -1,5 +1,5 @@
 import { RootMemberWordInterface } from "src/interfaces/root-member-word";
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { RootWord } from "./root-word.entity";
 
 @Entity()
@@ -8,14 +8,17 @@ export class RootMemberWord extends BaseEntity implements RootMemberWordInterfac
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Index()
+  @Column({
+    unique: true,
+  })
   name: string;
 
   @Column()
   definition: string;
 
   @Column()
-  type: string;
+  inlist: boolean;
 
   @ManyToOne(() => RootWord, rootWord => rootWord.rootMemberWords)
   rootWord: RootWord;

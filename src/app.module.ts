@@ -6,7 +6,9 @@ import { WordsModule } from './words/words.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(),
+    TypeOrmModule.forRoot({
+      autoLoadEntities: true,
+    }),
     WordsModule
   ],
   controllers: [AppController],
