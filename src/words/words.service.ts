@@ -59,10 +59,10 @@ export class WordsService {
 
       let { root, meaning, leafs } = membeanWords[rootWordItem];
 
-      const rootWord = new RootWord();
-      const wordExistInDB = await RootWord.findOne({name: root} )
+      let rootWord = await RootWord.findOne({name: root} )
 
-      if (!wordExistInDB) {
+      if (!rootWord) {
+        rootWord = new RootWord();
         rootWord.name = root;
         rootWord.meaning = meaning;
 
@@ -76,7 +76,14 @@ export class WordsService {
       for (let leaf in leafs) {
 
         let { inlist, wordform, meaning } = leafs[leaf];
-        const wordExistInDB = await RootMemberWord.findOne({name: wordform} )
+
+        wordform = wordform
+          .replace(/<em>|<\/em>/gi, '');
+
+        meaning = meaning
+          .replace(/<em>|<\/em>/gi, '');
+
+        const wordExistInDB = await RootMemberWord.findOne({ name: wordform } )
 
         if (!wordExistInDB) {
           const rootMemberWord = new RootMemberWord();
