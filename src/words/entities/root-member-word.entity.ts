@@ -3,15 +3,14 @@ import { BaseEntity, Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } 
 import { RootWord } from "./root-word.entity";
 
 @Entity()
+@Index(["name", "rootWord"], { unique: true })
 export class RootMemberWord extends BaseEntity implements RootMemberWordInterface {
 
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Index()
-  @Column({
-    unique: true,
-  })
+  @Column()
   name: string;
 
   @Column()

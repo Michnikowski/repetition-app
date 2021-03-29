@@ -13,7 +13,7 @@ export class WordsService {
 
     const browser: puppeteer.Browser = await puppeteer.launch({
       headless: false,
-      slowMo: 200,
+      slowMo: 250,
       devtools: true,
     });
 
@@ -28,7 +28,7 @@ export class WordsService {
     for ( const rootForm of rootForms ) {
 
       try {
-        await rootForm.click({ delay: 300 });
+        await rootForm.click({ delay: 350 });
         await page.waitForSelector('#treepanel');
 
         await page.once('response', async (response) => {
@@ -59,7 +59,7 @@ export class WordsService {
 
       let { root, meaning, leafs } = membeanWords[rootWordItem];
 
-      let rootWord = await RootWord.findOne({name: root} )
+      let rootWord = await RootWord.findOne({name: root, meaning: meaning} )
 
       if (!rootWord) {
         rootWord = new RootWord();
@@ -83,20 +83,21 @@ export class WordsService {
         meaning = meaning
           .replace(/<em>|<\/em>/gi, '');
 
-        const wordExistInDB = await RootMemberWord.findOne({ name: wordform } )
+        let rootMemberWord = await RootMemberWord.findOne({ name: wordform, rootWord: rootWord} )
 
-        if (!wordExistInDB) {
-          const rootMemberWord = new RootMemberWord();
+        if (!rootMemberWord) {
+          rootMemberWord = new RootMemberWord();
           rootMemberWord.name = wordform;
-          rootMemberWord.definition = meaning;
-          rootMemberWord.inlist = inlist;
-          rootMemberWord.rootWord = rootWord;
+        }
 
-          try {
-            await rootMemberWord.save();
-          } catch(e) {
-            console.log(e.message);
-          }
+        rootMemberWord.definition = meaning;
+        rootMemberWord.inlist = inlist;
+        rootMemberWord.rootWord = rootWord;
+
+        try {
+          await rootMemberWord.save();
+        } catch(e) {
+          console.log(e.message);
         }
       }
     }
