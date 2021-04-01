@@ -1,4 +1,4 @@
-export interface RootMemberWordInterface {
+export interface MemberRootWordInterface {
   id: string;
   name: string;
   definition: string;

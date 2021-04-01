@@ -3,8 +3,9 @@ import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 import * as puppeteer from 'puppeteer';
 import { GetMembeanWordsResponse } from './dto/membean.dto';
-import { RootWord } from './entities/root-word.entity';
-import { RootMemberWord } from './entities/root-member-word.entity';
+import { WordRoot } from './entities/word-root.entity';
+import { MemberRootWord } from './entities/member-root-word.entity';
+import {getConnection, getManager, getRepository} from "typeorm";
 
 @Injectable()
 export class WordsService {
@@ -59,18 +60,13 @@ export class WordsService {
 
       let { root, meaning, leafs } = membeanWords[rootWordItem];
 
-      let rootWord = await RootWord.findOne({name: root, meaning: meaning} )
+      let wordRoot = await WordRoot.findOne({name: root, meaning: meaning} )
 
-      if (!rootWord) {
-        rootWord = new RootWord();
-        rootWord.name = root;
-        rootWord.meaning = meaning;
-
-        try {
-          await rootWord.save();
-        } catch(e) {
-          console.log(e.message);
-        }
+      if (!wordRoot) {
+        wordRoot = new WordRoot();
+        wordRoot.name = root;
+        wordRoot.meaning = meaning;
+        await wordRoot.save();
       }
 
       for (let leaf in leafs) {
@@ -83,21 +79,19 @@ export class WordsService {
         meaning = meaning
           .replace(/<em>|<\/em>/gi, '');
 
-        let rootMemberWord = await RootMemberWord.findOne({ name: wordform, rootWord: rootWord} )
+        const memberRootWordResult = await MemberRootWord.createQueryBuilder("memberRootWord")
+          .leftJoinAndSelect("memberRootWord.wordRoots", "wordRoot")
+          .where("memberRootWord.name = :name", { name: wordform })
+          .andWhere("wordRoot.id = :id", { id: wordRoot.id })
+          .getOne();
 
-        if (!rootMemberWord) {
-          rootMemberWord = new RootMemberWord();
-          rootMemberWord.name = wordform;
-        }
-
-        rootMemberWord.definition = meaning;
-        rootMemberWord.inlist = inlist;
-        rootMemberWord.rootWord = rootWord;
-
-        try {
-          await rootMemberWord.save();
-        } catch(e) {
-          console.log(e.message);
+        if (!memberRootWordResult) {
+          const memberRootWord = new MemberRootWord();
+          memberRootWord.name = wordform;
+          memberRootWord.definition = meaning;
+          memberRootWord.inlist = inlist;
+          memberRootWord.wordRoots = [wordRoot];
+          await memberRootWord.save();
         }
       }
     }

@@ -1,4 +1,4 @@
-export interface RootWordInterface {
+export interface WordRootInterface {
   id: string;
   name: string;
   meaning: string;
