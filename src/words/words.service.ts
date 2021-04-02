@@ -5,7 +5,7 @@ import * as puppeteer from 'puppeteer';
 import { GetMembeanWordsResponse } from './dto/membean.dto';
 import { WordRoot } from './entities/word-root.entity';
 import { MemberRootWord } from './entities/member-root-word.entity';
-import {getConnection, getManager, getRepository} from "typeorm";
+import { getConnection } from 'typeorm';
 
 @Injectable()
 export class WordsService {
@@ -63,10 +63,18 @@ export class WordsService {
       let wordRoot = await WordRoot.findOne({name: root, meaning: meaning} )
 
       if (!wordRoot) {
+
         wordRoot = new WordRoot();
         wordRoot.name = root;
         wordRoot.meaning = meaning;
         await wordRoot.save();
+
+      } else {
+
+        if (wordRoot.meaning !== meaning) {
+          wordRoot.meaning = meaning;
+          await wordRoot.save();
+        }
       }
 
       for (let leaf in leafs) {
@@ -79,19 +87,42 @@ export class WordsService {
         meaning = meaning
           .replace(/<em>|<\/em>/gi, '');
 
-        const memberRootWordResult = await MemberRootWord.createQueryBuilder("memberRootWord")
-          .leftJoinAndSelect("memberRootWord.wordRoots", "wordRoot")
-          .where("memberRootWord.name = :name", { name: wordform })
-          .andWhere("wordRoot.id = :id", { id: wordRoot.id })
-          .getOne();
+        let memberRootWord = await MemberRootWord.findOne({
+          name: wordform
+        })
 
-        if (!memberRootWordResult) {
-          const memberRootWord = new MemberRootWord();
+        if (!memberRootWord) {
+
+          let memberRootWord = new MemberRootWord();
           memberRootWord.name = wordform;
           memberRootWord.definition = meaning;
           memberRootWord.inlist = inlist;
           memberRootWord.wordRoots = [wordRoot];
           await memberRootWord.save();
+
+        } else {
+
+          let memberRootWordWithRoot = await MemberRootWord.createQueryBuilder("memberRootWord")
+            .leftJoinAndSelect("memberRootWord.wordRoots", "wordRoot")
+            .where("memberRootWord.name = :name", { name: wordform })
+            .andWhere("wordRoot.id = :id", { id: wordRoot.id })
+            .getOne();
+
+          if (!memberRootWordWithRoot) {
+
+            await getConnection()
+              .createQueryBuilder()
+              .relation(MemberRootWord, "wordRoots")
+              .of(memberRootWord)
+              .add(wordRoot)
+
+          } else {
+
+            if (memberRootWordWithRoot.definition !== meaning) {
+              memberRootWordWithRoot.definition = meaning;
+              await memberRootWordWithRoot.save();
+            }
+          }
         }
       }
     }

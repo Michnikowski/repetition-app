@@ -1,5 +1,5 @@
 import { MemberRootWordInterface } from "src/interfaces/member-root-word";
-import { BaseEntity, Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Index, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { WordRoot } from "./word-root.entity";
 
 @Entity()
