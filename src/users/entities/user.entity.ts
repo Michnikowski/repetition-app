@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import { MemberRootWord } from "src/words/entities/member-root-word.entity";
+import { BaseEntity, Column, Entity, Index, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum UserRole {
   ADMIN = "admin",
@@ -30,7 +31,9 @@ export class User extends BaseEntity{
   })
   lastName: string;
 
-  @Index()
+  @Index({
+    unique:true,
+  })
   @Column({
     nullable: false,
     length: 255,
@@ -50,4 +53,7 @@ export class User extends BaseEntity{
     default: null,
   })
   currentTokenId: string | null;
+
+  @ManyToMany(() => MemberRootWord, memberRootWord => memberRootWord.users)
+  memberRootWords: MemberRootWord[];
 }
