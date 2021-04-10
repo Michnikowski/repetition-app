@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {{> head}}
+
+  <body>
+
+    <div class="container">
+      {{> navbar}}
+
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Definition</th>
+            <th scope="col">Membean?</th>
+          </tr>
+        </thead>
+        <tbody>
+        {{#each words}}
+          <tr>
+            <td>
+              {{this.name}}
+            </td>
+            <td>
+              {{this.definition}}
+            </td>
+            <td class="text-center">
+              {{#if this.inlist}}
+              Yes
+              {{else}}
+              No
+              {{/if}}
+            </td>
+          </tr>
+        {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

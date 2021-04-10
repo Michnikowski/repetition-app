@@ -130,23 +130,35 @@ export class WordsService {
     return membeanWords;
   }
 
-  create(createWordDto: CreateWordDto) {
-    return 'This action adds a new word';
+  async getMemberWordsByLetter(letter: string): Promise<Object[]> {
+
+    const wordsByLetter = await getConnection()
+      .createQueryBuilder()
+      .from(MemberRootWord, 'memberRootWord')
+      .where(`UPPER(LEFT(name,1))='${letter}'`)
+      .orderBy('name', 'ASC')
+      .getRawMany()
+
+    return wordsByLetter;
   }
 
-  findAll() {
-    return `This action returns all words`;
-  }
+  // create(createWordDto: CreateWordDto) {
+  //   return 'This action adds a new word';
+  // }
 
-  findOne(id: number) {
-    return `This action returns a #${id} word`;
-  }
+  // findAll() {
+  //   return `This action returns all words`;
+  // }
 
-  update(id: number, updateWordDto: UpdateWordDto) {
-    return `This action updates a #${id} word`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} word`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} word`;
-  }
+  // update(id: number, updateWordDto: UpdateWordDto) {
+  //   return `This action updates a #${id} word`;
+  // }
+
+  // remove(id: number) {
+  //   return `This action removes a #${id} word`;
+  // }
 }
