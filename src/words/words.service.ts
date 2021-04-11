@@ -130,16 +130,78 @@ export class WordsService {
     return membeanWords;
   }
 
-  async getMemberWordsByLetter(letter: string): Promise<Object[]> {
+  async getMemberWordsByLetter(letter: string, pageNumber: number = 1): Promise<Object> {
+
+    letter = letter.toUpperCase()
+
+    const maxPerPage = 10;
 
     const wordsByLetter = await getConnection()
       .createQueryBuilder()
       .from(MemberRootWord, 'memberRootWord')
       .where(`UPPER(LEFT(name,1))='${letter}'`)
       .orderBy('name', 'ASC')
+      .skip(maxPerPage * (pageNumber - 1))
+      .take(maxPerPage)
       .getRawMany()
 
-    return wordsByLetter;
+    const pagesCount = Math.ceil(
+      await getConnection()
+      .createQueryBuilder()
+      .from(MemberRootWord, 'memberRootWord')
+      .where(`UPPER(LEFT(name,1))='${letter}'`)
+      .orderBy('name', 'ASC')
+      .getCount() / maxPerPage)
+
+    const pages = [];
+
+    if (pagesCount <= 3) {
+      for (let i = 1; i <= pagesCount; i++){
+          pages.push(
+            {
+              pageNumber: i,
+              activePage: i === pageNumber
+            }
+          )
+        }
+      } else {
+
+        let i: number;
+        let stop: number;
+
+        if (pageNumber === 1) {
+          i = 1;
+          stop = 3;
+        } else if (pageNumber === pagesCount) {
+          i = pageNumber - 2;
+          stop = pagesCount;
+        } else {
+          i = pageNumber - 1;
+          stop = pageNumber + 1;
+        }
+
+        for (i; i <= stop; i++ ) {
+          pages.push(
+            {
+              pageNumber: i,
+              activePage: i === pageNumber
+            }
+          )
+        }
+      }
+
+    const pagination = {
+      prev: pageNumber > 1 ? pageNumber - 1 : 1,
+      next: pageNumber < pagesCount ? pageNumber + 1 : pagesCount,
+      first: 1,
+      last: pagesCount,
+    }
+
+    return {
+      words: wordsByLetter,
+      pages: pages,
+      pagination: pagination,
+    };
   }
 
   // create(createWordDto: CreateWordDto) {

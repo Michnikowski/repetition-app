@@ -12,12 +12,13 @@ export class WordsController {
     return this.wordsService.getMembeanWords();
   }
 
-  @Get('/:letter')
+  @Get('/:letter/:pageNumber')
   @Render('wordsByLetter')
   async getMemberWordsByLetter(
     @Param('letter') letter: string,
+    @Param('pageNumber') pageNumber: number,
   ) {
-    return {words: await this.wordsService.getMemberWordsByLetter(letter)};
+    return await this.wordsService.getMemberWordsByLetter(letter, Number(pageNumber));
   }
 
   // @Post()
