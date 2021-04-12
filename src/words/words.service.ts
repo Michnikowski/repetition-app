@@ -5,7 +5,7 @@ import * as puppeteer from 'puppeteer';
 import { GetMembeanWordsResponse } from './dto/membean.dto';
 import { WordRoot } from './entities/word-root.entity';
 import { MemberRootWord } from './entities/member-root-word.entity';
-import { getConnection } from 'typeorm';
+import { createQueryBuilder, getConnection, getRepository } from 'typeorm';
 
 @Injectable()
 export class WordsService {
@@ -136,22 +136,15 @@ export class WordsService {
 
     const maxPerPage = 10;
 
-    const wordsByLetter = await getConnection()
-      .createQueryBuilder()
-      .from(MemberRootWord, 'memberRootWord')
-      .where(`UPPER(LEFT(name,1))='${letter}'`)
-      .orderBy('name', 'ASC')
+    const [wordsByLetter, count] = await createQueryBuilder('MemberRootWord', 'memberRootWord')
+      .leftJoinAndSelect('memberRootWord.wordRoots', 'wordRoot')
+      .where(`UPPER(LEFT(memberRootWord.name,1))='${letter}'`)
+      .orderBy('memberRootWord.name', 'ASC')
       .skip(maxPerPage * (pageNumber - 1))
       .take(maxPerPage)
-      .getRawMany()
+      .getManyAndCount()
 
-    const pagesCount = Math.ceil(
-      await getConnection()
-      .createQueryBuilder()
-      .from(MemberRootWord, 'memberRootWord')
-      .where(`UPPER(LEFT(name,1))='${letter}'`)
-      .orderBy('name', 'ASC')
-      .getCount() / maxPerPage)
+    const pagesCount = Math.ceil(count / maxPerPage)
 
     const pages = [];
 

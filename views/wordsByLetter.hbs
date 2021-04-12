@@ -14,6 +14,7 @@
             <th scope="col">Name</th>
             <th scope="col">Definition</th>
             <th scope="col">Membean?</th>
+            <th scope="col">Root</th>
           </tr>
         </thead>
         <tbody>
@@ -31,6 +32,13 @@
               {{else}}
               No
               {{/if}}
+            </td>
+            <td>
+              <ul class="list-group">
+              {{#each this.wordRoots}}
+                <li class="list-group-item">{{this.name}}</li>
+              {{/each}}
+              </ul>
             </td>
           </tr>
         {{/each}}
