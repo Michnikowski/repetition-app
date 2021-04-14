@@ -1,4 +1,4 @@
-import { MemberRootWord } from "src/words/entities/member-root-word.entity";
+import { Word } from "src/words/entities/word.entity";
 import { BaseEntity, Column, Entity, Index, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum UserRole {
@@ -54,6 +54,6 @@ export class User extends BaseEntity{
   })
   currentTokenId: string | null;
 
-  @ManyToMany(() => MemberRootWord, memberRootWord => memberRootWord.users)
-  memberRootWords: MemberRootWord[];
+  @ManyToMany(() => Word, word => word.users)
+  words: Word[];
 }

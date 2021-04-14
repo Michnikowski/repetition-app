@@ -4,4 +4,4 @@ export class MembeanWord {
   leafs: object;
 }
 
-export type GetMembeanWordsResponse = MembeanWord[];
+export type GetWordsResponse = MembeanWord[];

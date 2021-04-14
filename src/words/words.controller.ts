@@ -9,16 +9,16 @@ export class WordsController {
 
   @Get('/membean')
   getMembeanWords(){
-    return this.wordsService.getMembeanWords();
+    return this.wordsService.getWords();
   }
 
   @Get('/:letter/:pageNumber')
   @Render('wordsByLetter')
-  async getMemberWordsByLetter(
+  async getWordsByLetter(
     @Param('letter') letter: string,
     @Param('pageNumber') pageNumber: number,
   ) {
-    return await this.wordsService.getMemberWordsByLetter(letter, Number(pageNumber));
+    return await this.wordsService.getWordsByLetter(letter, Number(pageNumber));
   }
 
   // @Post()

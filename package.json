@@ -26,6 +26,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^7.5.1",
     "@nestjs/typeorm": "^7.1.5",
+    "@types/hbs": "^4.0.1",
     "@types/puppeteer": "^5.4.3",
     "hbs": "^4.1.1",
     "pg": "^8.5.1",

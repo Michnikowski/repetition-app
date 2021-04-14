@@ -1,6 +1,6 @@
 import { WordRootInterface } from "src/interfaces/word-root";
 import { BaseEntity, Column, Entity, Index, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { MemberRootWord } from "./member-root-word.entity";
+import { Word } from "./word.entity";
 
 @Entity()
 @Index(["name", "meaning"], { unique: true })
@@ -15,8 +15,8 @@ export class WordRoot extends BaseEntity implements WordRootInterface {
   @Column()
   meaning: string;
 
-  @ManyToMany(() => MemberRootWord, memberRootWord => memberRootWord.wordRoots, {
+  @ManyToMany(() => Word, word => word.wordRoots, {
     cascade: true,
   })
-  memberRootWords: MemberRootWord[];
+  words: Word[];
 }

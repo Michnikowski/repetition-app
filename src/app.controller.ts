@@ -1,14 +1,3 @@
-// import { Get, Controller, Render } from '@nestjs/common';
-
-// @Controller()
-// export class AppController {
-//   @Get()
-//   @Render('index')
-//   root() {
-//     return { message: 'Hello world! ??' };
-//   }
-// }
-
 import { Get, Controller, Render } from '@nestjs/common';
 import { AppService } from './app.service';
 
@@ -20,6 +9,6 @@ export class AppController {
   @Get('/')
   @Render('home')
   async getAlphabet() {
-    return {letters: await this.appService.getAlphabet()};
+    return { letters: await this.appService.getAlphabet() };
   }
 }

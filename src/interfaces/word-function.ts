@@ -1,4 +1,4 @@
-export enum MemberType {
+export enum WordFunction {
   Noun,
   Pronoun,
   Verb,

@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { SpeechPart } from "./speech-part.entity";
+import { WordFunction } from "./word-function.entity";
 
 @Entity()
 export class Example extends BaseEntity {
@@ -12,6 +12,6 @@ export class Example extends BaseEntity {
   })
   example: string;
 
-  @ManyToOne(() => SpeechPart, speechPart => speechPart.examples)
-  speechPart: SpeechPart;
+  @ManyToOne(() => WordFunction, wordFunction => wordFunction.examples)
+  wordFunction: WordFunction;
 }

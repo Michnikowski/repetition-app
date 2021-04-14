@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { getConnection } from 'typeorm';
-import { MemberRootWord } from './words/entities/member-root-word.entity';
+import { Word } from './words/entities/word.entity';
 
 @Injectable()
 export class AppService {
   async getAlphabet(): Promise<Object[]> {
 
-    const alphabetBasedOnMemberRootWords = await getConnection()
+    const alphabetBasedOnWords = await getConnection()
       .createQueryBuilder()
-      .select('UPPER(LEFT(memberRootWord.name,1))', 'letter')
+      .select('UPPER(LEFT(word.name,1))', 'letter')
       .distinctOn(['letter'])
-      .from(MemberRootWord, 'memberRootWord')
+      .from(Word, 'word')
       .orderBy('letter', 'ASC')
       .getRawMany()
       
-    return alphabetBasedOnMemberRootWords
+    return alphabetBasedOnWords
   }
 }
