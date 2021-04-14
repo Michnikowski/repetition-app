@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { WordsModule } from './words/words.module';
 import { UsersModule } from './users/users.module';
+import { RootsModule } from './roots/roots.module';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { UsersModule } from './users/users.module';
       autoLoadEntities: true,
     }),
     WordsModule,
-    UsersModule
+    UsersModule,
+    RootsModule
   ],
   controllers: [AppController],
   providers: [AppService],

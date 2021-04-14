@@ -9,14 +9,14 @@
       {{> navbar}}
 
       <div class="letters">
-
-        <div class="row py-4">
+        <h3 class="text-center py-3">Words by letter</h3>
+        <div class="row">
         {{#each letters}}
 
           <div class="col-1 text-center py-3">
             <div class="list-group">
               <a href="/words/{{letter}}/1" class="list-group-item list-group-item-action">
-                {{letter}}
+                <h5>{{letter}}</h5>
               </a>
             </div>
           </div>

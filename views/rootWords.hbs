@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {{> head}}
+
+  <body>
+
+    <div class="container">
+      {{> navbar}}
+
+      <div class="words">
+        <h3 class="text-center py-3">Root words</h3>
+        <div class="row">
+        {{#each rootWords}}
+
+          <div class="col-3 text-center py-3">
+            <div class="list-group">
+              <a href="/roots/{{name}}" class="list-group-item list-group-item-action">
+                <h3><b>{{name}}</b></h3>
+                <div><em>{{meaning}}</em></div>
+                <div>{{word_count}}</div>
+              </a>
+            </div>
+          </div>
+
+        {{/each}}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

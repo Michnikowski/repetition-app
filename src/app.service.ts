@@ -4,7 +4,7 @@ import { Word } from './words/entities/word.entity';
 
 @Injectable()
 export class AppService {
-  async getAlphabet(): Promise<Object[]> {
+  async getAlphabet(): Promise<Object> {
 
     const alphabetBasedOnWords = await getConnection()
       .createQueryBuilder()
@@ -13,7 +13,9 @@ export class AppService {
       .from(Word, 'word')
       .orderBy('letter', 'ASC')
       .getRawMany()
-      
-    return alphabetBasedOnWords
+
+    return {
+      letters: alphabetBasedOnWords
+    }
   }
 }

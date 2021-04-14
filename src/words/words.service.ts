@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateWordDto } from './dto/create-word.dto';
-import { UpdateWordDto } from './dto/update-word.dto';
 import * as puppeteer from 'puppeteer';
 import { GetWordsResponse } from './dto/membean.dto';
-import { WordRoot } from './entities/word-root.entity';
+import { WordRoot } from '../roots/entities/word-root.entity';
 import { Word } from './entities/word.entity';
 import { createQueryBuilder, getConnection, getRepository } from 'typeorm';
 import { getPagination, getPaginationPages } from 'src/helpers/helper';
@@ -158,23 +156,4 @@ export class WordsService {
     };
   }
 
-  // create(createWordDto: CreateWordDto) {
-  //   return 'This action adds a new word';
-  // }
-
-  // findAll() {
-  //   return `This action returns all words`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} word`;
-  // }
-
-  // update(id: number, updateWordDto: UpdateWordDto) {
-  //   return `This action updates a #${id} word`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} word`;
-  // }
 }

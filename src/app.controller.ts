@@ -9,6 +9,6 @@ export class AppController {
   @Get('/')
   @Render('home')
   async getAlphabet() {
-    return { letters: await this.appService.getAlphabet() };
+    return await this.appService.getAlphabet();
   }
 }

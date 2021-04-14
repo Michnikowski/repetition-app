@@ -1,6 +1,6 @@
 import { WordRootInterface } from "src/interfaces/word-root";
 import { BaseEntity, Column, Entity, Index, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Word } from "./word.entity";
+import { Word } from "../../words/entities/word.entity";
 
 @Entity()
 @Index(["name", "meaning"], { unique: true })

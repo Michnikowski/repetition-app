@@ -2,7 +2,7 @@ import { WordInterface } from "src/interfaces/word";
 import { User } from "src/users/entities/user.entity";
 import { BaseEntity, Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { WordFunction } from "./word-function.entity";
-import { WordRoot } from "./word-root.entity";
+import { WordRoot } from "../../roots/entities/word-root.entity";
 
 @Entity()
 export class Word extends BaseEntity implements WordInterface {
