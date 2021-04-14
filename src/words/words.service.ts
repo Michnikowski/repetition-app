@@ -6,6 +6,7 @@ import { GetWordsResponse } from './dto/membean.dto';
 import { WordRoot } from './entities/word-root.entity';
 import { Word } from './entities/word.entity';
 import { createQueryBuilder, getConnection, getRepository } from 'typeorm';
+import { getPagination, getPaginationPages } from 'src/helpers/helper';
 
 @Injectable()
 export class WordsService {
@@ -146,49 +147,9 @@ export class WordsService {
 
     const pagesCount = Math.ceil(count / maxPerPage)
 
-    const pages = [];
+    const pages: object[] = getPaginationPages(pagesCount, pageNumber)
 
-    if (pagesCount <= 3) {
-      for (let i = 1; i <= pagesCount; i++){
-          pages.push(
-            {
-              pageNumber: i,
-              activePage: i === pageNumber
-            }
-          )
-        }
-      } else {
-
-        let i: number;
-        let stop: number;
-
-        if (pageNumber === 1) {
-          i = 1;
-          stop = 3;
-        } else if (pageNumber === pagesCount) {
-          i = pageNumber - 2;
-          stop = pagesCount;
-        } else {
-          i = pageNumber - 1;
-          stop = pageNumber + 1;
-        }
-
-        for (i; i <= stop; i++ ) {
-          pages.push(
-            {
-              pageNumber: i,
-              activePage: i === pageNumber
-            }
-          )
-        }
-      }
-
-    const pagination = {
-      prev: pageNumber > 1 ? pageNumber - 1 : 1,
-      next: pageNumber < pagesCount ? pageNumber + 1 : pagesCount,
-      first: 1,
-      last: pagesCount,
-    }
+    const pagination: object = getPagination(pagesCount, pageNumber)
 
     return {
       words: wordsByLetter,
