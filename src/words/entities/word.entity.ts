@@ -18,18 +18,18 @@ export class Word extends BaseEntity implements WordInterface {
   definition: string;
 
   @Column()
-  inlist: boolean;
+  membean: boolean;
 
   @Column({
     type: "text",
     nullable: true,
   })
-  audio: string;
+  audioURL: string;
 
   @Column({
     nullable: true,
   })
-  phoneticsText: string;
+  phoneticNotation: string;
 
   @ManyToMany(() => WordRoot, wordRoot => wordRoot.words)
   @JoinTable()

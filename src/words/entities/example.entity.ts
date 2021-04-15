@@ -10,7 +10,7 @@ export class Example extends BaseEntity {
   @Column({
     type: "text",
   })
-  example: string;
+  usage: string;
 
   @ManyToOne(() => WordFunction, wordFunction => wordFunction.examples)
   wordFunction: WordFunction;

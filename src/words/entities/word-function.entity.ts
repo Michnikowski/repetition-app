@@ -11,7 +11,7 @@ export class WordFunction extends BaseEntity {
   id: string;
 
   @Column()
-  wordFunction: string;
+  function: string;
 
   @ManyToOne(() => Word, word => word.wordFunctions)
   word: Word;

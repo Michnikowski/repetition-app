@@ -13,7 +13,7 @@ export class WordsService {
 
     const browser: puppeteer.Browser = await puppeteer.launch({
       headless: false,
-      slowMo: 150,
+      slowMo: 250,
       devtools: true,
     });
 
@@ -28,7 +28,7 @@ export class WordsService {
     for ( const rootForm of rootForms ) {
 
       try {
-        await rootForm.click({ delay: 200 });
+        await rootForm.click({ delay: 300 });
         await page.waitForSelector('#treepanel');
 
         page.once('response', async (response) => {
@@ -95,7 +95,7 @@ export class WordsService {
           word = new Word();
           word.name = wordform;
           word.definition = meaning;
-          word.inlist = inlist;
+          word.membean = inlist;
           word.wordRoots = [wordRoot];
           await word.save();
 
