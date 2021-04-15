@@ -24,7 +24,7 @@ export class Word extends BaseEntity implements WordInterface {
     type: "text",
     nullable: true,
   })
-  audioURL: string;
+  audioUrl: string;
 
   @Column({
     nullable: true,

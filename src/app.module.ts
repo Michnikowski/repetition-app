@@ -5,6 +5,8 @@ import { AppService } from './app.service';
 import { WordsModule } from './words/words.module';
 import { UsersModule } from './users/users.module';
 import { RootsModule } from './roots/roots.module';
+import { WordsService } from './words/words.service';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -13,9 +15,12 @@ import { RootsModule } from './roots/roots.module';
     }),
     WordsModule,
     UsersModule,
-    RootsModule
+    RootsModule,
+    AdminModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService
+  ],
 })
 export class AppModule {}
