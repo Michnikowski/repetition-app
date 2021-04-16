@@ -20,12 +20,12 @@ export class AdminController {
   @Get('/defintion/update')
   @Redirect('/admin')
   async updateWordDefinitions() {
-    return console.log('updateWORD')
+    return await this.adminService.updateWordDefinitions()
   }
 
   @Get('/definition/add')
   @Redirect('/admin')
-  async addWordDefinition() {
-    return console.log('addWORD')
+  async addMissingWordDefinitions() {
+    return await this.adminService.addMissingWordDefinitions()
   }
 }

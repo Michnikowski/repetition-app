@@ -1,10 +1,10 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { WordFunction } from "./word-function.entity";
 
 @Entity()
 export class Definition extends BaseEntity {
 
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({
@@ -12,6 +12,10 @@ export class Definition extends BaseEntity {
   })
   definition: string;
 
-  @ManyToOne(() => WordFunction, wordFunction => wordFunction.definitions)
+  @ManyToOne(() => WordFunction, wordFunction => wordFunction.definitions, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
   wordFunction: WordFunction;
 }

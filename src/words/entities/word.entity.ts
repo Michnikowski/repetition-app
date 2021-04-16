@@ -1,6 +1,6 @@
 import { WordInterface } from "src/interfaces/word";
 import { User } from "src/users/entities/user.entity";
-import { BaseEntity, Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { WordFunction } from "./word-function.entity";
 import { WordRoot } from "../../roots/entities/word-root.entity";
 
@@ -40,5 +40,6 @@ export class Word extends BaseEntity implements WordInterface {
   users: User[];
 
   @OneToMany(() => WordFunction, wordFunction => wordFunction.word)
+  @JoinColumn()
   wordFunctions: WordFunction[];
 }

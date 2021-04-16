@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { WordFunction } from "./word-function.entity";
 
 @Entity()
@@ -12,6 +12,10 @@ export class Example extends BaseEntity {
   })
   usage: string;
 
-  @ManyToOne(() => WordFunction, wordFunction => wordFunction.examples)
+  @ManyToOne(() => WordFunction, wordFunction => wordFunction.examples, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
   wordFunction: WordFunction;
 }
