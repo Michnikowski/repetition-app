@@ -10,7 +10,7 @@ export class Definition extends BaseEntity {
   @Column({
     type: "text",
   })
-  definition: string;
+  definement: string;
 
   @ManyToOne(() => WordFunction, wordFunction => wordFunction.definitions, {
     cascade: true,

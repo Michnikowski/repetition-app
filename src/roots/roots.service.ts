@@ -3,7 +3,6 @@ import { createQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class RootsService {
-
   async getRootWords(): Promise<Object[]> {
 
     const rootWords = await createQueryBuilder('WordRoot', 'wordRoot')
@@ -18,7 +17,6 @@ export class RootsService {
   }
 
   async getWordsByRoot(wordRoot: string): Promise<Object> {
-
     const wordsByRoot = await createQueryBuilder('Word', 'word')
       .leftJoin('word.wordRoots', 'wordRoot')
       .where(`wordRoot.name = '${wordRoot}'`)

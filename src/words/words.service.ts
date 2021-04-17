@@ -10,7 +10,6 @@ import { getPagination, getPaginationPages } from 'src/helpers/helper';
 export class WordsService {
 
   async getWords(): Promise<object[]> {
-
     const browser: puppeteer.Browser = await puppeteer.launch({
       headless: false,
       slowMo: 250,
@@ -22,11 +21,9 @@ export class WordsService {
     await page.waitForSelector('#treelist');
 
     const rootForms = await page.$$(`span.rootform > a`);
-
     const membeanWords: GetWordsResponse = [];
 
     for ( const rootForm of rootForms ) {
-
       try {
         await rootForm.click({ delay: 300 });
         await page.waitForSelector('#treepanel');
@@ -56,20 +53,16 @@ export class WordsService {
     await browser.close();
 
     for ( let rootWordItem in membeanWords ) {
-
       let { root, meaning, leafs } = membeanWords[rootWordItem];
-
       let wordRoot = await WordRoot.findOne({name: root, meaning: meaning} )
 
       if (!wordRoot) {
-
         wordRoot = new WordRoot();
         wordRoot.name = root;
         wordRoot.meaning = meaning;
         await wordRoot.save();
 
       } else {
-
         if (wordRoot.meaning !== meaning) {
           wordRoot.meaning = meaning;
           await wordRoot.save();
@@ -77,7 +70,6 @@ export class WordsService {
       }
 
       for (let leaf in leafs) {
-
         let { inlist, wordform, meaning } = leafs[leaf];
 
         wordform = wordform
@@ -91,7 +83,6 @@ export class WordsService {
         })
 
         if (!word) {
-
           word = new Word();
           word.name = wordform;
           word.definition = meaning;
@@ -100,7 +91,6 @@ export class WordsService {
           await word.save();
 
         } else {
-
           let wordWithRoot = await Word.createQueryBuilder("word")
             .leftJoinAndSelect("word.wordRoots", "wordRoot")
             .where("word.name = :name", { name: wordform })
@@ -108,7 +98,6 @@ export class WordsService {
             .getOne();
 
           if (!wordWithRoot) {
-
             await getConnection()
               .createQueryBuilder()
               .relation(Word, "wordRoots")
@@ -116,7 +105,6 @@ export class WordsService {
               .add(wordRoot)
 
           } else {
-
             if (wordWithRoot.definition !== meaning) {
               wordWithRoot.definition = meaning;
               await wordWithRoot.save();
@@ -130,7 +118,6 @@ export class WordsService {
   }
 
   async getWordsByLetter(letter: string, pageNumber: number = 1): Promise<Object> {
-
     letter = letter.toUpperCase()
 
     const maxPerPage = 10;

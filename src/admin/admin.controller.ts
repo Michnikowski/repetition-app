@@ -1,8 +1,6 @@
 import { Controller, Get, Post, Render, Redirect } from '@nestjs/common';
 import { WordsService } from 'src/words/words.service';
 import { AdminService } from './admin.service';
-
-
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService,
@@ -28,4 +26,5 @@ export class AdminController {
   async addMissingWordDefinitions() {
     return await this.adminService.addMissingWordDefinitions()
   }
+
 }

@@ -1,5 +1,4 @@
 export function getPaginationPages(pagesCount: number, pageNumber: number) {
-
   const pages = [];
 
   if (pagesCount <= 3) {
@@ -13,7 +12,6 @@ export function getPaginationPages(pagesCount: number, pageNumber: number) {
     }
     
   } else {
-
     let i: number;
     let stop: number;
 
