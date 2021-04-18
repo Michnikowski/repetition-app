@@ -20,7 +20,7 @@ export class RootsService {
     const wordsByRoot = await createQueryBuilder('Word', 'word')
       .leftJoin('word.wordRoots', 'wordRoot')
       .where(`wordRoot.name = '${wordRoot}'`)
-      .orderBy('word.name', 'ASC')
+      .orderBy('LOWER(word.name)', 'ASC')
       .getMany()
 
     return {
