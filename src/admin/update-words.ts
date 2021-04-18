@@ -11,7 +11,14 @@ export async function updateWords(words: Word[]) {
   let exampleEntity: Example;
 
   for (const word of words) {
-    let data = await fetchData(word.name);
+    let wordName: string
+    if (word.name.includes("(")){
+      wordName = word.name.slice(0, word.name.indexOf("("))
+    } else {
+      wordName = word.name
+    }
+
+    let data = await fetchData(wordName);
 
     if (!data) continue;
 
