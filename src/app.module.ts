@@ -6,6 +6,7 @@ import { WordsModule } from './words/words.module';
 import { UsersModule } from './users/users.module';
 import { RootsModule } from './roots/roots.module';
 import { AdminModule } from './admin/admin.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { AdminModule } from './admin/admin.module';
     WordsModule,
     UsersModule,
     RootsModule,
-    AdminModule
+    AdminModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [

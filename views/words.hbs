@@ -12,9 +12,12 @@
         <thead>
           <tr>
             <th style="width: 17%" scope="col">Word</th>
-            <th style="width: 65%" scope="col">Definition</th>
+            <th style="width: 55%" scope="col">Definition</th>
             <th style="width: 15%" scope="col">Phonetics</th>
             <th style="width: 3%" scope="col">Membean</th>
+            {{#if root}}
+            <th style="width: 13%" scope="col">Root</th>
+            {{/if}}
           </tr>
         </thead>
         <tbody>
@@ -44,10 +47,24 @@
               No
               {{/if}}
             </td>
+            {{#if this.wordRoots}}
+            <td>
+              <ul class="list-group">
+              {{#each this.wordRoots}}
+                <li class="list-group-item"><a href="/roots/{{this.name}}">{{this.name}}</a></li>
+              {{/each}}
+              </ul>
+            </td>
+            {{/if}}
           </tr>
         {{/each}}
         </tbody>
       </table>
+
+      {{#if root}}
+      {{> pagination}}
+      {{/if}}
+
     </div>
   </body>
 </html>

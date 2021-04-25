@@ -4,7 +4,7 @@ import { GetWordsResponse } from './dto/membean.dto';
 import { WordRoot } from '../roots/entities/word-root.entity';
 import { Word } from './entities/word.entity';
 import { createQueryBuilder, getConnection, getRepository } from 'typeorm';
-import { getPagination, getPaginationPages } from 'src/helpers/helper';
+import { getPagination, getPaginationPages } from 'src/utils/pagination';
 
 @Injectable()
 export class WordsService {
@@ -140,6 +140,7 @@ export class WordsService {
       words: wordsByLetter,
       pages: pages,
       pagination: pagination,
+      root: true,
     };
   }
 

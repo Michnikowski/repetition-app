@@ -1,26 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { RegisterUserResponse } from 'src/interfaces/user';
+import { hashPwd } from 'src/utils/hash-pwd';
+import { RegisterDto } from './dto/register.dto';
+import { User, UserRole } from './entities/user.entity';
+import { Response } from 'express';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  filter(user: User): RegisterUserResponse {
+    const {id, email} = user;
+    return {id, email};
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async register(newUser: RegisterDto, res: Response): Promise<any> {
+    try {
+    const user = new User();
+    user.email = newUser.email;
+    user.firstName = newUser.firstName;
+    user.lastName = newUser.lastName;
+    user.isActive = true
+    user.role = UserRole.USER
+    user.pwdHash = hashPwd(newUser.pwd);
+    await user.save();
+
+    return res.redirect('/users/login')
+    } catch (e) {
+      return res.render('register', {registerError: true})
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
 }

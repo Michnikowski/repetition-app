@@ -10,7 +10,6 @@ export function getPaginationPages(pagesCount: number, pageNumber: number) {
         }
       )
     }
-    
   } else {
     let i: number;
     let stop: number;

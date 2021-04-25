@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Word } from 'src/words/entities/word.entity';
-import { getConnection, IsNull } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { updateWords } from './update-words';
 
 @Injectable()

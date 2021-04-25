@@ -1,7 +1,10 @@
-import { Controller, Get, Param, Render } from '@nestjs/common';
+import { Controller, Get, Param, Render, UseFilters, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthExceptionFilter } from 'src/filters/auth-exceptions.filter';
 import { RootsService } from './roots.service';
-
 @Controller('roots')
+@UseFilters(AuthExceptionFilter)
+@UseGuards(AuthGuard('jwt'))
 export class RootsController {
   constructor(private readonly rootsService: RootsService) {}
 
@@ -12,7 +15,7 @@ export class RootsController {
   }
 
   @Get('/:wordRoot')
-  @Render('wordsByRoot')
+  @Render('words')
   async getWordsByRoot(
     @Param('wordRoot') wordRoot: string,
   ) {
