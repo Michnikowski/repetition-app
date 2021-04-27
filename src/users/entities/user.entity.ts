@@ -1,5 +1,6 @@
+import { UserWord } from "src/words/entities/user-word.entity";
 import { Word } from "src/words/entities/word.entity";
-import { BaseEntity, Column, Entity, Index, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Index, JoinColumn, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum UserRole {
   ADMIN = "admin",
@@ -54,6 +55,7 @@ export class User extends BaseEntity{
   })
   currentTokenId: string | null;
 
-  @ManyToMany(() => Word, word => word.users)
-  words: Word[];
+  @OneToMany(() => UserWord, userWord => userWord.user)
+  @JoinColumn()
+  userWords: UserWord[];
 }
