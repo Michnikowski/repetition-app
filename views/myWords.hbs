@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {{> head}}
+
+  <body>
+
+    <div class="container">
+      {{> navbar}}
+      <div class="d-flex justify-content-between py-3">
+        <div class="p-2"></div>
+        <div class="p-2 text-center"><h3>My words</h3></div>
+        <div class="p-2">
+          {{#if randomWords}}
+          <form action="/mywords/randomWords" method="get">
+            <button class="btn btn-outline-primary" type="submit">
+              Add 10 random words
+            </button>
+          </form>
+          {{/if}}
+        </div>
+      </div>
+
+      <div class="row">
+        {{#each words}}
+
+          <div class="col-2 text-center py-3">
+            <div class="list-group">
+              <form action="/mywords/word/{{this.name}}" method="post">
+                <ul class="nav navbar-nav navbar-right">
+                  <li>
+                    <button class="list-group-item list-group-item-action" name="id" value="{{this.id}}"><h5>{{this.name}}</h5></button>
+                  </li>
+                </ul>
+              </form>
+            </div>
+          </div>
+
+        {{/each}}
+      </div>
+
+      {{> pagination}}
+
+    </div>
+  </body>
+</html>

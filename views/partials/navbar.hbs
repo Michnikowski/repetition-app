@@ -13,14 +13,21 @@
             <li class="nav-item">
               <a class="nav-link" href="/roots">Roots</a>
             </li>
+            <form class="form-inline my-2 my-lg-0" action="/mywords/1" method="GET">
+              <ul class="nav navbar-nav navbar-right">
+                <li>
+                  <a class="nav-link" href="/mywords/1">My words</a>
+                </li>
+              </ul>
+            </form>
             <li class="nav-item">
               <a class="nav-link" href="/admin">Admin</a>
             </li>
           </ul>
-          <form class="form-inline my-2 my-lg-0" action="/auth/login" id="login" method="POST">
+          <form class="form-inline my-2 my-lg-0" action="/auth/login" id="logout" method="POST">
             <ul class="nav navbar-nav navbar-right">
               <li>
-                <button class="btn btn btn-outline-secondary btn-sm" type="submit"><a href="/auth/logout">Logout</a></button>
+                <a class="nav-link" href="/auth/logout">Logout</a>
               </li>
             </ul>
           </form>

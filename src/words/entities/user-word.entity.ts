@@ -1,5 +1,5 @@
 import { User } from "src/users/entities/user.entity";
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { Word } from "./word.entity";
 
 export enum Status {
@@ -8,6 +8,7 @@ export enum Status {
 }
 
 @Entity()
+@Unique(["word", "user"])
 export class UserWord extends BaseEntity {
 
   @PrimaryGeneratedColumn('uuid')
@@ -20,8 +21,11 @@ export class UserWord extends BaseEntity {
   })
   wordStatus: Status
 
-  @Column()
-  lastUpdatedDate: Date
+  @Column({
+    type: 'timestamptz',
+    nullable: true
+  })
+  lastUpdatedDate: Date;
 
   @ManyToOne(() => Word, word => word.userWords, {
     cascade: true,

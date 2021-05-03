@@ -1,11 +1,13 @@
-<ul class="pagination justify-content-center">
-  <li class="page-item"><a class="page-link" href="{{pagination.first}}">First</a></li>
-  <li class="page-item"><a class="page-link" href="{{pagination.prev}}">Prev</a></li>
-  {{#each pages}}
-  <li class='page-item {{#if this.activePage}}active{{/if}}'>
-    <a class="page-link" href="{{this.pageNumber}}">{{pageNumber}}</a>
-  </li>
-  {{/each}}
-  <li class="page-item"><a class="page-link" href="{{pagination.next}}">Next</a></li>
-  <li class="page-item"><a class="page-link" href="{{pagination.last}}">Last: {{pagination.last}}</a></li>
-</ul>
+{{#if pagination.prev}}
+  <ul class="pagination justify-content-center">
+    <li class="page-item"><a class="page-link" href="{{pagination.first}}">First</a></li>
+    <li class="page-item"><a class="page-link" href="{{pagination.prev}}">Prev</a></li>
+    {{#each pages}}
+    <li class='page-item {{#if this.activePage}}active{{/if}}'>
+      <a class="page-link" href="{{this.pageNumber}}">{{pageNumber}}</a>
+    </li>
+    {{/each}}
+    <li class="page-item"><a class="page-link" href="{{pagination.next}}">Next</a></li>
+    <li class="page-item"><a class="page-link" href="{{pagination.last}}">Last: {{pagination.last}}</a></li>
+  </ul>
+{{/if}}

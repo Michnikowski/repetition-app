@@ -15,11 +15,13 @@
 
           <div class="col-3 text-center py-3">
             <div class="list-group">
-              <a href="/roots/{{name}}" class="list-group-item list-group-item-action">
-                <h3><b>{{name}}</b></h3>
-                <div><em>{{meaning}}</em></div>
-                <div>{{word_count}}</div>
-              </a>
+              <form action="/roots/{{this.name}}/{{this.id}}" method="post">
+                <button class="list-group-item list-group-item-action" type="submit" name="id" value={{this.id}}>
+                  <h3><b>{{name}}</b></h3>
+                  <div><em>{{meaning}}</em></div>
+                  <div>{{word_count}}</div>
+                </button>
+              </form>
             </div>
           </div>
 

@@ -7,16 +7,19 @@
 
     <div class="container">
       {{> navbar}}
-      <h3 class="text-center py-3">{{wordRoot}}</h3>
+      <h3 class="text-center py-3">{{letter}}{{wordRoot}}</h3>
+      {{#if wordRootMeaning}}
+      <h5 class="text-center">{{wordRootMeaning.meaning}}</h5>
+      {{/if}}
       <table class="table table-bordered table-responsive">
-        <thead>
+        <thead class="text-center">
           <tr>
             <th style="width: 17%" scope="col">Word</th>
-            <th style="width: 55%" scope="col">Definition</th>
-            <th style="width: 15%" scope="col">Phonetics</th>
+            <th style="width: 58%" scope="col">Definition</th>
+            <th style="width: 12%" scope="col">Phonetics</th>
             <th style="width: 3%" scope="col">Membean</th>
             {{#if root}}
-            <th style="width: 13%" scope="col">Root</th>
+            <th style="width: 10%" scope="col">Root</th>
             {{/if}}
           </tr>
         </thead>
@@ -24,15 +27,39 @@
         {{#each words}}
           <tr>
             <td>
-              <h5>{{#if this.audioUrl}}
-                <a href={{this.audioUrl}} target="_blank">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-square" viewBox="0 0 16 16">
-                    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                    <path d="M5.795 12.456A.5.5 0 0 1 5.5 12V4a.5.5 0 0 1 .832-.374l4.5 4a.5.5 0 0 1 0 .748l-4.5 4a.5.5 0 0 1-.537.082z"/>
-                  </svg>
-                </a>
+              {{#if this.addWord}}
+              <form action="" method="post" name="add">
+                <div class="d-flex justify-content-between">
+                  <button class="btn btn-outline-success btn text-left flex-grow-1" type="submit" name="add" value={{this.id}}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16">
+                      <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                    {{this.name}}
+                  </button>
+                  {{#if this.audioUrl}}
+                    {{> audioUrl}}
+                  {{/if}}
+                  {{> videoUrl}}
+                </div>
+              </form>
+              {{else}}
+              <form action="" method="post" name="del">
+                <div class="d-flex justify-content-between">
+                  <button class="btn btn-outline-danger btn text-left flex-grow-1" type="submit" name="del" value={{this.id}}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-square" viewBox="0 0 16 16">
+                      <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                      <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+                    </svg>
+                    {{this.name}}
+                  </button>
+                  {{#if this.audioUrl}}
+                    {{> audioUrl}}
+                  {{/if}}
+                  {{> videoUrl}}
+                </div>
+              </form>
               {{/if}}
-              {{this.name}}</h5>
             </td>
             <td>
               {{this.definition}}
@@ -49,11 +76,15 @@
             </td>
             {{#if this.wordRoots}}
             <td>
-              <ul class="list-group">
+              <div class="d-grid gap-1">
               {{#each this.wordRoots}}
-                <li class="list-group-item"><a href="/roots/{{this.name}}">{{this.name}}</a></li>
+                <form action="/roots/{{this.name}}/{{this.id}}" method="post">
+                  <button class="btn btn-sm btn-outline-secondary btn-block" type="submit" name="id" value={{this.id}}>
+                    {{this.name}}
+                  </button>
+                </form>
               {{/each}}
-              </ul>
+              </div>
             </td>
             {{/if}}
           </tr>

@@ -3,8 +3,10 @@ import * as puppeteer from 'puppeteer';
 import { GetWordsResponse } from './dto/membean.dto';
 import { WordRoot } from '../roots/entities/word-root.entity';
 import { Word } from './entities/word.entity';
-import { createQueryBuilder, getConnection, getRepository } from 'typeorm';
+import { createQueryBuilder, getConnection } from 'typeorm';
 import { getPagination, getPaginationPages } from 'src/utils/pagination';
+import { User } from 'src/users/entities/user.entity';
+import { Status, UserWord } from './entities/user-word.entity';
 
 @Injectable()
 export class WordsService {
@@ -117,18 +119,38 @@ export class WordsService {
     return membeanWords;
   }
 
-  async getWordsByLetter(letter: string, pageNumber: number = 1): Promise<Object> {
+  async getWordsByLetter(letter: string, pageNumber: number = 1, user: User): Promise<Object> {
     letter = letter.toUpperCase()
 
     const maxPerPage = 10;
 
-    const [wordsByLetter, count] = await createQueryBuilder('Word', 'word')
+    const [words, count] = await createQueryBuilder('Word', 'word')
       .leftJoinAndSelect('word.wordRoots', 'wordRoot')
+      .leftJoinAndSelect('word.userWords', 'userWord')
+      .leftJoinAndSelect('userWord.user', 'user')
       .where(`UPPER(LEFT(word.name,1))='${letter}'`)
       .orderBy('word.name', 'ASC')
       .skip(maxPerPage * (pageNumber - 1))
       .take(maxPerPage)
       .getManyAndCount()
+
+    const wordsByLetter = words.map(item => {
+
+      const userWords = item['userWords']
+      let addWord: boolean = true
+
+      for (const userWord of userWords) {
+        if (userWord.user.id === user.id) {
+          addWord = false;
+          break;
+        }
+      }
+
+      delete item['userWords']
+      item['addWord'] = addWord
+
+      return item
+    })
 
     const pagesCount = Math.ceil(count / maxPerPage)
 
@@ -141,7 +163,34 @@ export class WordsService {
       pages: pages,
       pagination: pagination,
       root: true,
+      letter,
     };
   }
 
+  async addWordToUser(body, user: User, letter: string, pageNumber: number): Promise<Object> {
+
+    const word = await Word.findOne(body.add)
+
+    const userWord = new UserWord();
+    userWord.wordStatus = Status.ACTIVE
+    userWord.lastUpdatedDate = new Date();
+    userWord.word = word;
+    userWord.user = user;
+    await userWord.save();
+
+    return await this.getWordsByLetter(letter, pageNumber, user)
+  }
+
+  async deleteUserWord(body, user: User, letter: string, pageNumber: number): Promise<Object> {
+
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(UserWord)
+      .where("wordId = :wordId", {wordId: `${body.del}`})
+      .andWhere("userId = :userId", {userId: `${user.id}`})
+      .execute();
+
+    return await this.getWordsByLetter(letter, pageNumber, user)
+  }
 }

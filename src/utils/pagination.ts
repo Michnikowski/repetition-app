@@ -1,4 +1,7 @@
 export function getPaginationPages(pagesCount: number, pageNumber: number) {
+
+  if (pagesCount < 2 ) return []
+
   const pages = [];
 
   if (pagesCount <= 3) {
@@ -38,10 +41,15 @@ export function getPaginationPages(pagesCount: number, pageNumber: number) {
 }
 
 export function getPagination(pagesCount: number, pageNumber: number) {
-  return {
-    prev: pageNumber > 1 ? pageNumber - 1 : 1,
-    next: pageNumber < pagesCount ? pageNumber + 1 : pagesCount,
-    first: 1,
-    last: pagesCount,
+
+  if (pagesCount < 2 ) {
+    return {}
+  } else {
+    return {
+      prev: pageNumber > 1 ? pageNumber - 1 : 1,
+      next: pageNumber < pagesCount ? pageNumber + 1 : pagesCount,
+      first: 1,
+      last: pagesCount,
+    }
   }
 }
