@@ -8,6 +8,7 @@ import { RootsModule } from './roots/roots.module';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { MywordsModule } from './mywords/mywords.module';
+import { RepetitionsModule } from './repetitions/repetitions.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { MywordsModule } from './mywords/mywords.module';
     RootsModule,
     AdminModule,
     AuthModule,
-    MywordsModule
+    MywordsModule,
+    RepetitionsModule
   ],
   controllers: [AppController],
   providers: [
