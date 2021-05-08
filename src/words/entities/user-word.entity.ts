@@ -7,6 +7,15 @@ export enum Status {
   INACTIVE = "inactive"
 }
 
+export enum WordLevel {
+  ZERO = 0,
+  FIRST = 1,
+  SECOND = 3,
+  THIRD = 7,
+  FOURTH = 14,
+  FIFTH = 60
+}
+
 @Entity()
 @Unique(["word", "user"])
 export class UserWord extends BaseEntity {
@@ -22,10 +31,23 @@ export class UserWord extends BaseEntity {
   wordStatus: Status
 
   @Column({
+    type: "enum",
+    enum: WordLevel,
+    default: WordLevel.ZERO
+  })
+  wordLevel: WordLevel
+
+  @Column({
     type: 'timestamptz',
     nullable: true
   })
   lastUpdatedDate: Date;
+
+  @Column({
+    type: 'timestamptz',
+    nullable: true
+  })
+  repetitionDate: Date;
 
   @ManyToOne(() => Word, word => word.userWords, {
     cascade: true,

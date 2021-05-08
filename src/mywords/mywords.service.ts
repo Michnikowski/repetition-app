@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/users/entities/user.entity';
 import { getPagination, getPaginationPages } from 'src/utils/pagination';
-import { Status, UserWord } from 'src/words/entities/user-word.entity';
+import { Status, UserWord, WordLevel } from 'src/words/entities/user-word.entity';
 import { Word } from 'src/words/entities/word.entity';
 import { createQueryBuilder, getConnection, Not } from 'typeorm';
 
@@ -87,8 +87,10 @@ export class MywordsService {
     for (const word of wordsToAdd) {
       const singleWord = await Word.findOne(word['id'])
       const userWord = new UserWord();
-      userWord.wordStatus = Status.ACTIVE
+      userWord.wordStatus = Status.ACTIVE;
       userWord.lastUpdatedDate = inputDate;
+      userWord.repetitionDate = inputDate;
+      userWord.wordLevel = WordLevel.ZERO;
       userWord.word = singleWord;
       userWord.user = user;
       await userWord.save();

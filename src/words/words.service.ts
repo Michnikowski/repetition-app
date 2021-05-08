@@ -6,7 +6,7 @@ import { Word } from './entities/word.entity';
 import { createQueryBuilder, getConnection } from 'typeorm';
 import { getPagination, getPaginationPages } from 'src/utils/pagination';
 import { User } from 'src/users/entities/user.entity';
-import { Status, UserWord } from './entities/user-word.entity';
+import { Status, UserWord, WordLevel } from './entities/user-word.entity';
 
 @Injectable()
 export class WordsService {
@@ -174,6 +174,8 @@ export class WordsService {
     const userWord = new UserWord();
     userWord.wordStatus = Status.ACTIVE
     userWord.lastUpdatedDate = new Date();
+    userWord.repetitionDate = new Date();
+    userWord.wordLevel = WordLevel.ZERO;
     userWord.word = word;
     userWord.user = user;
     await userWord.save();
