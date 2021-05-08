@@ -29,7 +29,7 @@ export class RootsController {
     } else if (body.hasOwnProperty('del')) {
       return await this.rootsService.deleteUserWord(wordRoot, body['del'], user, rootId);
     } else if (body.hasOwnProperty('id')) {
-      return await this.rootsService.getWordsByRoot(wordRoot,user,  rootId);
+      return await this.rootsService.getWordsByRoot(wordRoot, user, rootId);
     }
   }
 

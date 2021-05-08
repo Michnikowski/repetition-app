@@ -14,16 +14,16 @@ export class UsersService {
 
   async register(newUser: RegisterDto, res: Response): Promise<any> {
     try {
-    const user = new User();
-    user.email = newUser.email;
-    user.firstName = newUser.firstName;
-    user.lastName = newUser.lastName;
-    user.isActive = true
-    user.role = UserRole.USER
-    user.pwdHash = hashPwd(newUser.pwd);
-    await user.save();
+      const user = new User();
+      user.email = newUser.email;
+      user.firstName = newUser.firstName;
+      user.lastName = newUser.lastName;
+      user.isActive = true
+      user.role = UserRole.USER
+      user.pwdHash = hashPwd(newUser.pwd);
+      await user.save();
 
-    return res.redirect('/users/login')
+      return res.redirect('/users/login')
     } catch (e) {
       return res.render('register', {registerError: true})
     }

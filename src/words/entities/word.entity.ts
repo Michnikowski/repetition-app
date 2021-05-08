@@ -43,4 +43,5 @@ export class Word extends BaseEntity implements WordInterface {
   @OneToMany(() => UserWord, userWord => userWord.word)
   @JoinColumn()
   userWords: UserWord[];
+
 }

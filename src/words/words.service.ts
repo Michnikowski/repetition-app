@@ -167,9 +167,9 @@ export class WordsService {
     };
   }
 
-  async addWordToUser(body, user: User, letter: string, pageNumber: number): Promise<Object> {
+  async addWordToUser(wordId: string, user: User, letter: string, pageNumber: number): Promise<Object> {
 
-    const word = await Word.findOne(body.add)
+    const word = await Word.findOne(wordId)
 
     const userWord = new UserWord();
     userWord.wordStatus = Status.ACTIVE
@@ -181,13 +181,13 @@ export class WordsService {
     return await this.getWordsByLetter(letter, pageNumber, user)
   }
 
-  async deleteUserWord(body, user: User, letter: string, pageNumber: number): Promise<Object> {
+  async deleteUserWord(wordId: string, user: User, letter: string, pageNumber: number): Promise<Object> {
 
     await getConnection()
       .createQueryBuilder()
       .delete()
       .from(UserWord)
-      .where("wordId = :wordId", {wordId: `${body.del}`})
+      .where("wordId = :wordId", {wordId: `${wordId}`})
       .andWhere("userId = :userId", {userId: `${user.id}`})
       .execute();
 

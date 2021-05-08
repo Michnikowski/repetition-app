@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Render, Res, UseFilters } from '@nestjs/common';
+import { Controller, Get, Post, Body, Render, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterUserResponse } from 'src/interfaces/user';

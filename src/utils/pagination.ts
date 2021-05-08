@@ -2,7 +2,7 @@ export function getPaginationPages(pagesCount: number, pageNumber: number) {
 
   if (pagesCount < 2 ) return []
 
-  const pages = [];
+  const pages: Object[] = [];
 
   if (pagesCount <= 3) {
     for (let i = 1; i <= pagesCount; i++) {

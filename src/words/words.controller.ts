@@ -31,9 +31,9 @@ export class WordsController {
     pageNumber = Number(pageNumber)
 
     if (body.hasOwnProperty('add')) {
-      return await this.wordsService.addWordToUser(body, user, letter, pageNumber)
+      return await this.wordsService.addWordToUser(body['add'], user, letter, pageNumber)
     } else if (body.hasOwnProperty('del')) {
-      return await this.wordsService.deleteUserWord(body, user, letter, pageNumber)
+      return await this.wordsService.deleteUserWord(body['del'], user, letter, pageNumber)
     }
   }
 
