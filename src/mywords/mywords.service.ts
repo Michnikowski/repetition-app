@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/users/entities/user.entity';
 import { getPagination, getPaginationPages } from 'src/utils/pagination';
-import { Status, UserWord, WordLevel } from 'src/words/entities/user-word.entity';
+import { Status, UserWord, RepetitionTime } from 'src/words/entities/user-word.entity';
 import { Word } from 'src/words/entities/word.entity';
 import { createQueryBuilder, getConnection, Not } from 'typeorm';
 
@@ -90,7 +90,7 @@ export class MywordsService {
       userWord.wordStatus = Status.ACTIVE;
       userWord.lastUpdatedDate = inputDate;
       userWord.repetitionDate = inputDate;
-      userWord.wordLevel = WordLevel.ZERO;
+      userWord.wordLevel = RepetitionTime.IMMEDIATELLY;
       userWord.word = singleWord;
       userWord.user = user;
       await userWord.save();

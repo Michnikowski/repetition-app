@@ -1,12 +1,10 @@
 import { UserWord } from "src/words/entities/user-word.entity";
-import { Word } from "src/words/entities/word.entity";
 import { BaseEntity, Column, Entity, Index, JoinColumn, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum UserRole {
   ADMIN = "admin",
   USER = "user"
 }
-
 @Entity()
 export class User extends BaseEntity{
 

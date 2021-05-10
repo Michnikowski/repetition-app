@@ -7,13 +7,13 @@ export enum Status {
   INACTIVE = "inactive"
 }
 
-export enum WordLevel {
-  ZERO = 0,
-  FIRST = 1,
-  SECOND = 3,
-  THIRD = 7,
-  FOURTH = 14,
-  FIFTH = 60
+export enum RepetitionTime {
+  IMMEDIATELLY = 0,
+  TOMORROW = 1,
+  IN_THREE_DAYS = 3,
+  IN_SEVEN_DAYS = 7,
+  IN_FOURTEEN_DAYS = 14,
+  IN_SIXTY_DAYS = 60
 }
 
 @Entity()
@@ -32,10 +32,10 @@ export class UserWord extends BaseEntity {
 
   @Column({
     type: "enum",
-    enum: WordLevel,
-    default: WordLevel.ZERO
+    enum: RepetitionTime,
+    default: RepetitionTime.IMMEDIATELLY
   })
-  wordLevel: WordLevel
+  wordLevel: RepetitionTime
 
   @Column({
     type: 'timestamptz',
