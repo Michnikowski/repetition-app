@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ActionType, Log } from 'src/users/entities/log.entity';
 import { User } from 'src/users/entities/user.entity';
 import { getPagination, getPaginationPages } from 'src/utils/pagination';
 import { Status, UserWord, RepetitionTime } from 'src/words/entities/user-word.entity';
@@ -45,6 +46,16 @@ export class MywordsService {
   }
 
   async deleteUserWord(user: User, wordId: string) {
+    const word = await Word.findOne(wordId)
+
+    const currentWordRepetitionTime = await createQueryBuilder('UserWord', 'userWord')
+      .select('userWord.repetitionTime')
+      .where("userWord.wordId = :wordId", {wordId: `${wordId}`})
+      .andWhere("userWord.userId = :userId", {userId: `${user.id}`})
+      .getOne()
+
+    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime['repetitionTime']]
+
     await getConnection()
       .createQueryBuilder()
       .delete()
@@ -52,6 +63,14 @@ export class MywordsService {
       .where("wordId = :wordId", { wordId })
       .andWhere("userId = :userId", { userId: `${user.id}` })
       .execute();
+
+    const log = new Log();
+    log.actionDate = new Date();
+    log.actionType = ActionType.DELETION;
+    log.repetitionTime = RepetitionTime[wordRepetitionTime]
+    log.user = user;
+    log.word = word;
+    await log.save();
   }
 
   async appendRandomWords(user: User): Promise<Object> {
@@ -90,10 +109,18 @@ export class MywordsService {
       userWord.wordStatus = Status.ACTIVE;
       userWord.lastUpdatedDate = inputDate;
       userWord.repetitionDate = inputDate;
-      userWord.wordLevel = RepetitionTime.IMMEDIATELLY;
+      userWord.repetitionTime = RepetitionTime.IMMEDIATELLY;
       userWord.word = singleWord;
       userWord.user = user;
       await userWord.save();
+
+      const log = new Log();
+      log.actionDate = inputDate;
+      log.actionType = ActionType.ADDITION_BY_RANDOM;
+      log.repetitionTime = RepetitionTime.IMMEDIATELLY;
+      log.user = user;
+      log.word = singleWord;
+      await log.save();
     }
 
     return {

@@ -7,6 +7,7 @@ import { createQueryBuilder, getConnection } from 'typeorm';
 import { getPagination, getPaginationPages } from 'src/utils/pagination';
 import { User } from 'src/users/entities/user.entity';
 import { Status, UserWord, RepetitionTime } from './entities/user-word.entity';
+import { ActionType, Log } from 'src/users/entities/log.entity';
 
 @Injectable()
 export class WordsService {
@@ -170,20 +171,39 @@ export class WordsService {
   async addWordToUser(wordId: string, user: User, letter: string, pageNumber: number): Promise<Object> {
 
     const word = await Word.findOne(wordId)
+    const inputDate: Date = new Date();
 
     const userWord = new UserWord();
     userWord.wordStatus = Status.ACTIVE
-    userWord.lastUpdatedDate = new Date();
-    userWord.repetitionDate = new Date();
-    userWord.wordLevel = RepetitionTime.IMMEDIATELLY;
+    userWord.lastUpdatedDate = inputDate;
+    userWord.repetitionDate = inputDate;
+    userWord.repetitionTime = RepetitionTime.IMMEDIATELLY;
     userWord.word = word;
     userWord.user = user;
     await userWord.save();
+
+    const log = new Log();
+    log.actionDate = inputDate;
+    log.actionType = ActionType.ADDITION_BY_USER;
+    log.repetitionTime = RepetitionTime.IMMEDIATELLY;
+    log.user = user;
+    log.word = word;
+    await log.save();
 
     return await this.getWordsByLetter(letter, pageNumber, user)
   }
 
   async deleteUserWord(wordId: string, user: User, letter: string, pageNumber: number): Promise<Object> {
+
+    const word = await Word.findOne(wordId)
+
+    const currentWordRepetitionTime = await createQueryBuilder('UserWord', 'userWord')
+      .select('userWord.repetitionTime')
+      .where("userWord.wordId = :wordId", {wordId: `${wordId}`})
+      .andWhere("userWord.userId = :userId", {userId: `${user.id}`})
+      .getOne()
+
+    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime['repetitionTime']]
 
     await getConnection()
       .createQueryBuilder()
@@ -192,6 +212,14 @@ export class WordsService {
       .where("wordId = :wordId", {wordId: `${wordId}`})
       .andWhere("userId = :userId", {userId: `${user.id}`})
       .execute();
+
+    const log = new Log();
+    log.actionDate = new Date();
+    log.actionType = ActionType.DELETION;
+    log.repetitionTime = RepetitionTime[wordRepetitionTime]
+    log.user = user;
+    log.word = word;
+    await log.save();
 
     return await this.getWordsByLetter(letter, pageNumber, user)
   }

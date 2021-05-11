@@ -35,7 +35,7 @@ export class UserWord extends BaseEntity {
     enum: RepetitionTime,
     default: RepetitionTime.IMMEDIATELLY
   })
-  wordLevel: RepetitionTime
+  repetitionTime: RepetitionTime
 
   @Column({
     type: 'timestamptz',
