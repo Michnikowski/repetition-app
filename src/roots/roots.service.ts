@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { ActionType, Log, RepetitionTime } from 'src/users/entities/log.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Status, UserWord } from 'src/words/entities/user-word.entity';
 import { Word } from 'src/words/entities/word.entity';
-import { createQueryBuilder, getConnection } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { WordRoot } from './entities/word-root.entity';
 
 @Injectable()
 export class RootsService {
   async getRootWords(): Promise<Object[]> {
 
-    const rootWords = await createQueryBuilder('WordRoot', 'wordRoot')
+    const rootWords = await WordRoot.createQueryBuilder('wordRoot')
       .leftJoin('wordRoot.words', 'word')
       .select('wordRoot.name, wordRoot.meaning, wordRoot.id')
       .addSelect("COUNT(word.id) as word_count")
@@ -21,7 +22,7 @@ export class RootsService {
   }
 
   async getWordsByRoot(wordRoot: string, user: User,  rootId: string): Promise<Object> {
-    const words = await createQueryBuilder('Word', 'word')
+    const words = await Word.createQueryBuilder( 'word')
       .leftJoin('word.wordRoots', 'wordRoot')
       .leftJoinAndSelect('word.userWords', 'userWord')
       .leftJoinAndSelect('userWord.user', 'user')
@@ -31,7 +32,7 @@ export class RootsService {
 
     const wordsByRoot = words.map(item => {
 
-      const userWords = item['userWords']
+      const userWords = item.userWords
       let addWord: boolean = true
 
       for (const userWord of userWords) {
@@ -41,7 +42,7 @@ export class RootsService {
         }
       }
 
-      delete item['userWords']
+      delete item.userWords
       item['addWord'] = addWord
 
       return item
@@ -60,17 +61,45 @@ export class RootsService {
 
     const word = await Word.findOne(wordId)
 
+    const inputDate: Date = new Date();
+
     const userWord = new UserWord();
     userWord.wordStatus = Status.ACTIVE
-    userWord.lastUpdatedDate = new Date();
+    userWord.lastUpdatedDate = inputDate;
+    userWord.repetitionDate = inputDate;
     userWord.word = word;
     userWord.user = user;
     await userWord.save();
+
+    const log = new Log();
+    log.actionDate = inputDate;
+    log.actionType = ActionType.ADDITION_BY_USER;
+    log.repetitionTime = RepetitionTime.IMMEDIATELLY;
+    log.user = user;
+    log.word = word;
+    await log.save();
 
     return await this.getWordsByRoot(wordRoot, user, rootId);
   }
 
   async deleteUserWord(wordRoot: string, wordId: string, user: User, rootId: string): Promise<Object> {
+    const word = await Word.findOne(wordId)
+
+    const currentWordRepetitionTime = await UserWord.createQueryBuilder( 'userWord')
+      .select('userWord.repetitionTime')
+      .where("userWord.wordId = :wordId", {wordId: `${wordId}`})
+      .andWhere("userWord.userId = :userId", {userId: `${user.id}`})
+      .getOne()
+
+    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime.repetitionTime]
+
+    const log = new Log();
+    log.actionDate = new Date();
+    log.actionType = ActionType.DELETION;
+    log.repetitionTime = RepetitionTime[wordRepetitionTime]
+    log.user = user;
+    log.word = word;
+    await log.save();
 
     await getConnection()
       .createQueryBuilder()

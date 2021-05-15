@@ -4,6 +4,7 @@ import { hashPwd } from 'src/utils/hash-pwd';
 import { RegisterDto } from './dto/register.dto';
 import { User, UserRole } from './entities/user.entity';
 import { Response } from 'express';
+import { ActionType, Log } from './entities/log.entity';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +23,12 @@ export class UsersService {
       user.role = UserRole.USER
       user.pwdHash = hashPwd(newUser.pwd);
       await user.save();
+
+      const log = new Log();
+      log.actionDate = new Date();
+      log.actionType = ActionType.REGISTRATION;
+      log.user = user;
+      await log.save();
 
       return res.redirect('/users/login')
     } catch (e) {

@@ -125,7 +125,7 @@ export class WordsService {
 
     const maxPerPage = 10;
 
-    const [words, count] = await createQueryBuilder('Word', 'word')
+    const [words, count] = await Word.createQueryBuilder( 'word')
       .leftJoinAndSelect('word.wordRoots', 'wordRoot')
       .leftJoinAndSelect('word.userWords', 'userWord')
       .leftJoinAndSelect('userWord.user', 'user')
@@ -137,7 +137,7 @@ export class WordsService {
 
     const wordsByLetter = words.map(item => {
 
-      const userWords = item['userWords']
+      const userWords = item.userWords
       let addWord: boolean = true
 
       for (const userWord of userWords) {
@@ -147,7 +147,7 @@ export class WordsService {
         }
       }
 
-      delete item['userWords']
+      delete item.userWords
       item['addWord'] = addWord
 
       return item
@@ -197,13 +197,13 @@ export class WordsService {
 
     const word = await Word.findOne(wordId)
 
-    const currentWordRepetitionTime = await createQueryBuilder('UserWord', 'userWord')
+    const currentWordRepetitionTime = await UserWord.createQueryBuilder('userWord')
       .select('userWord.repetitionTime')
       .where("userWord.wordId = :wordId", {wordId: `${wordId}`})
       .andWhere("userWord.userId = :userId", {userId: `${user.id}`})
       .getOne()
 
-    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime['repetitionTime']]
+    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime.repetitionTime]
 
     await getConnection()
       .createQueryBuilder()

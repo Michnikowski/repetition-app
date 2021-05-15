@@ -7,7 +7,96 @@
 
     <div class="container">
       {{> navbar}}
-
+      <br>
+      <div class="container-fluid text-center">
+        <br>
+        <div class="row">
+          {{#if noWordsToRepetition}}
+          <br>
+          <br>
+          <div class="col display-5">{{noWordsToRepetition}}</div>
+          {{else}}
+          <div class="col display-5">{{repetitionWord.name}}</div>
+          {{/if}}
+        </div>
+        <br>
+        <br>
+        <div class="row">
+          <div class="col" style="font-size:25px">{{repetitionWord.definition}}</div>
+        </div>
+        <br>
+      </div>
+      <br>
+      <br>
+      {{#unless noWordsToRepetition}}
+      <div class="row justify-content-center text-center">
+        <div class="col">
+          <h5>Phonetic notation</h5>
+        </div>
+        <div class="col">
+          <h5>Audio</h5>
+        </div>
+        <div class="col">
+          <h5>Video</h5>
+        </div>
+        <div class="col">
+          <h5>Membean</h5>
+        </div>
+      </div>
+      <div class="row justify-content-center text-center">
+        <div class="col">
+          <h4>{{repetitionWord.phoneticNotation}}</h4>
+        </div>
+        <div class="col">
+          {{#if repetitionWord.audioUrl}}
+            {{> audioUrl}}
+          {{/if}}
+        </div>
+        <div class="col">
+          {{> videoUrl}}
+        </div>
+        <div class="col"><h4>
+          {{#if repetitionWord.membean}}
+            Yes
+          {{else}}
+            No
+          {{/if}}
+          </h4>
+        </div>
+      </div>
+      <br>
+      <br>
+      <br>
+      <div class="form-row">
+        <div class="col-sm-2"></div>
+        {{#each repetitionTime}}
+        <div class="col">
+          <form action="" method="POST">
+              <div class="col form-group btn-group btn-group-justified">
+                <button type="submit" class="btn {{this.btn}}">
+                  {{this.buttonDescription}}
+                  {{#if arrowDown}}
+                    {{> arrowDown}}
+                  {{/if}}
+                  {{#if arrowUp}}
+                    {{> arrowUp}}
+                  {{/if}}
+                  {{#if repeat}}
+                    {{> repeat}}
+                  {{/if}}
+                  {{#if wink}}
+                    {{> wink}}
+                  {{/if}}
+                </button>
+                <input type="hidden" name="wordId" value="{{this.wordId}}" />
+                <input type="hidden" name="repetitionTime" value="{{this.repetitionTime}}" />
+              </div>
+          </form>
+        </div>
+        {{/each}}
+        <div class="col-sm-2"></div>
+      </div>
+      {{/unless}}
     </div>
   </body>
 </html>

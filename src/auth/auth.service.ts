@@ -6,6 +6,7 @@ import { AuthLoginDto } from './dto/auth-login.dto';
 import { v4 as uuid } from 'uuid';
 import { sign } from 'jsonwebtoken';
 import { JwtPayload } from './jwt.strategy';
+import { ActionType, Log } from 'src/users/entities/log.entity';
 
 @Injectable()
 export class AuthService {
@@ -45,6 +46,12 @@ export class AuthService {
 
       const token = await this.createToken(await this.generateToken(user));
 
+      const log = new Log();
+      log.actionDate = new Date();
+      log.actionType = ActionType.LOGIN;
+      log.user = user;
+      await log.save();
+
       return res
         .cookie('jwt', token.accessToken, {
           secure: false,
@@ -58,6 +65,13 @@ export class AuthService {
   };
 
   async logout(user: User, res: Response) {
+
+    const log = new Log();
+    log.actionDate = new Date();
+    log.actionType = ActionType.LOGOUT;
+    log.user = user;
+    await log.save();
+
     try {
         user.currentTokenId = null;
         await user.save();

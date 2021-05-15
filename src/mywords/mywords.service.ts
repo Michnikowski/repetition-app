@@ -12,7 +12,7 @@ export class MywordsService {
   async findAllUserWords(user: User, pageNumber: number = 1): Promise<Object> {
     const maxPerPage = 48;
 
-    const [userWords, count] = await createQueryBuilder('Word', 'word')
+    const [userWords, count] = await Word.createQueryBuilder('word')
       .innerJoin('word.userWords', 'userWords')
       .where(`userWords.userId = '${user.id}'`)
       .orderBy('word.name', 'ASC')
@@ -35,7 +35,7 @@ export class MywordsService {
   }
 
   async findSingleWord(body): Promise<Object> {
-    const word = await createQueryBuilder('Word', 'word')
+    const word = await Word.createQueryBuilder( 'word')
       .leftJoinAndSelect('word.wordFunctions', 'wordFunction')
       .leftJoinAndSelect('wordFunction.definitions', 'definition')
       .leftJoinAndSelect('wordFunction.examples', 'example')
@@ -48,13 +48,13 @@ export class MywordsService {
   async deleteUserWord(user: User, wordId: string) {
     const word = await Word.findOne(wordId)
 
-    const currentWordRepetitionTime = await createQueryBuilder('UserWord', 'userWord')
+    const currentWordRepetitionTime = await UserWord.createQueryBuilder('userWord')
       .select('userWord.repetitionTime')
       .where("userWord.wordId = :wordId", {wordId: `${wordId}`})
       .andWhere("userWord.userId = :userId", {userId: `${user.id}`})
       .getOne()
 
-    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime['repetitionTime']]
+    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime.repetitionTime]
 
     await getConnection()
       .createQueryBuilder()
@@ -74,7 +74,7 @@ export class MywordsService {
   }
 
   async appendRandomWords(user: User): Promise<Object> {
-    const userWordIds = await createQueryBuilder('Word', 'word')
+    const userWordIds = await Word.createQueryBuilder( 'word')
       .select('word.id')
       .innerJoin('word.userWords', 'userWords')
       .where(`userWords.userId = '${user.id}'`)
@@ -83,19 +83,19 @@ export class MywordsService {
     const userWordIdsArray: Array<string> = [];
 
     for (const word of userWordIds) {
-      userWordIdsArray.push(word['id'])
+      userWordIdsArray.push(word.id)
     }
 
-    let wordsToAdd: Object[]
+    let wordsToAdd: Word[]
 
     if (userWordIdsArray.length > 0){
-      wordsToAdd = await createQueryBuilder('Word', 'word')
+      wordsToAdd = await Word.createQueryBuilder('word')
         .where('word.id NOT IN (:...ids)', { ids: userWordIdsArray })
         .orderBy('random()', 'ASC')
         .take(10)
         .getMany()
     } else {
-      wordsToAdd = await createQueryBuilder('Word', 'word')
+      wordsToAdd = await Word.createQueryBuilder( 'word')
         .orderBy('random()', 'ASC')
         .take(10)
         .getMany()
@@ -104,8 +104,9 @@ export class MywordsService {
     const inputDate: Date = new Date();
 
     for (const word of wordsToAdd) {
-      const singleWord = await Word.findOne(word['id'])
+      const singleWord = await Word.findOne(word.id)
       const userWord = new UserWord();
+
       userWord.wordStatus = Status.ACTIVE;
       userWord.lastUpdatedDate = inputDate;
       userWord.repetitionDate = inputDate;

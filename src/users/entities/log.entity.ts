@@ -19,7 +19,11 @@ export enum ActionType {
   LEVEL_DOWN = 'level down',
   LEVEL_NO_CHANGE = 'level no change',
   CHANGE_STATUS_ACTIVE = 'change status to active',
-  CHANGE_STATUS_INACTIVE = 'change status to inactive'
+  CHANGE_STATUS_INACTIVE = 'change status to inactive',
+  SHOWING_IN_TODAY_WORDS = 'showing in today words',
+  REGISTRATION = 'registration',
+  LOGIN = 'login',
+  LOGOUT = 'logout'
 }
 @Entity()
 export class Log extends BaseEntity{
@@ -41,7 +45,8 @@ export class Log extends BaseEntity{
 
   @Column({
     type: "enum",
-    enum: RepetitionTime
+    enum: RepetitionTime,
+    nullable: true
   })
   repetitionTime: RepetitionTime
 
@@ -55,6 +60,7 @@ export class Log extends BaseEntity{
   @ManyToOne(() => Word, word => word.logs, {
     cascade: true,
     onDelete: 'CASCADE',
+    nullable: true,
   })
   @JoinColumn()
   word: Word;

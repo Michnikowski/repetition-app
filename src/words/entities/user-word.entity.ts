@@ -44,7 +44,7 @@ export class UserWord extends BaseEntity {
   lastUpdatedDate: Date;
 
   @Column({
-    type: 'timestamptz',
+    type: 'date',
     nullable: true
   })
   repetitionDate: Date;
