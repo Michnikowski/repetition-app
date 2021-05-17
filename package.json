@@ -36,7 +36,7 @@
     "cookie-parser": "^1.4.5",
     "date-fns": "^2.21.3",
     "hbs": "^4.1.1",
-    "highlightjs": "^10.7.2",
+    "highlightjs": "^9.16.2",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pg": "^8.5.1",

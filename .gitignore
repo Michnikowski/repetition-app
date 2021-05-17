@@ -35,3 +35,8 @@ lerna-debug.log*
 
 .env
 TODO.md
+
+# docker
+.dockerignore
+docker-compose.yml
+Dockerfile

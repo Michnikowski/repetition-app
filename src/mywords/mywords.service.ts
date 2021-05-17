@@ -4,7 +4,7 @@ import { User } from 'src/users/entities/user.entity';
 import { getPagination, getPaginationPages } from 'src/utils/pagination';
 import { Status, UserWord, RepetitionTime } from 'src/words/entities/user-word.entity';
 import { Word } from 'src/words/entities/word.entity';
-import { createQueryBuilder, getConnection, Not } from 'typeorm';
+import { getConnection } from 'typeorm';
 
 @Injectable()
 export class MywordsService {

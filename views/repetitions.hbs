@@ -9,6 +9,13 @@
       {{> navbar}}
       <br>
       <div class="container-fluid text-center">
+        {{#unless noWordsToRepetition}}
+        <div class="form-row">
+          <form action="/mywords/word/{{repetitionWord.name}}" method="post">
+            <button class="btn btn-outline-secondary" name="id" value="{{repetitionWord.id}}">Details</button>
+          </form>
+        </div>
+        {{/unless}}
         <br>
         <div class="row">
           {{#if noWordsToRepetition}}
