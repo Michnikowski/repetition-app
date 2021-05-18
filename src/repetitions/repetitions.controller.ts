@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Redirect, Render, UseFilters, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Redirect,
+  Render,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserObj } from 'src/decorators/user-obj.decorator';
 import { AuthExceptionFilter } from 'src/filters/auth-exceptions.filter';
@@ -13,9 +22,7 @@ export class RepetitionsController {
   constructor(private readonly repetitionsService: RepetitionsService) {}
   @Get('/')
   @Render('repetitions')
-  async getTodayUserWord(
-    @UserObj() user: User,
-  ) {
+  async getTodayUserWord(@UserObj() user: User) {
     return await this.repetitionsService.getTodayUserWord(user);
   }
 
@@ -23,9 +30,8 @@ export class RepetitionsController {
   @Redirect('/repetitions')
   async updateUserWord(
     @UserObj() user: User,
-    @Body() body: UpdateUserWordDto,
+    @Body() wordDetails: UpdateUserWordDto,
   ) {
-    return await this.repetitionsService.updateUserWord(user, body);
+    return await this.repetitionsService.updateUserWord(user, wordDetails);
   }
-
 }

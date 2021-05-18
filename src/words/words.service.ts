@@ -3,16 +3,17 @@ import * as puppeteer from 'puppeteer';
 import { GetWordsResponse } from './dto/membean.dto';
 import { WordRoot } from '../roots/entities/word-root.entity';
 import { Word } from './entities/word.entity';
-import { createQueryBuilder, getConnection } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { getPagination, getPaginationPages } from 'src/utils/pagination';
 import { User } from 'src/users/entities/user.entity';
 import { Status, UserWord, RepetitionTime } from './entities/user-word.entity';
 import { ActionType, Log } from 'src/users/entities/log.entity';
+import { Pagination } from 'src/interfaces/pagination';
+import { PaginationPages } from 'src/interfaces/pagination-page';
 
 @Injectable()
 export class WordsService {
-
-  async getWords(): Promise<object[]> {
+  async getWords() {
     const browser: puppeteer.Browser = await puppeteer.launch({
       headless: false,
       slowMo: 250,
@@ -26,45 +27,42 @@ export class WordsService {
     const rootForms = await page.$$(`span.rootform > a`);
     const membeanWords: GetWordsResponse = [];
 
-    for ( const rootForm of rootForms ) {
+    for (const rootForm of rootForms) {
       try {
         await rootForm.click({ delay: 300 });
         await page.waitForSelector('#treepanel');
 
         page.once('response', async (response) => {
+          const dataObject = await response.json();
 
-          const dataObject = await response.json()
-
-          let rootForm: string = await dataObject.data.drootform;
-          let meaning: string = await dataObject.data.meaning;
-          let leafs: object[] = await dataObject.data.leafs;
+          const rootForm: string = await dataObject.data.drootform;
+          const meaning: string = await dataObject.data.meaning;
+          const leafs = await dataObject.data.leafs;
 
           membeanWords.push({
             root: rootForm,
             meaning: meaning,
-            leafs: leafs
-          })
+            leafs: leafs,
+          });
         });
 
-        await page.click('#sb-nav-close')
-
-      } catch(e) {
+        await page.click('#sb-nav-close');
+      } catch (e) {
         console.log(e.message);
       }
     }
 
     await browser.close();
 
-    for ( let rootWordItem in membeanWords ) {
-      let { root, meaning, leafs } = membeanWords[rootWordItem];
-      let wordRoot = await WordRoot.findOne({name: root, meaning: meaning} )
+    for (const rootWordItem in membeanWords) {
+      const { root, meaning, leafs } = membeanWords[rootWordItem];
+      let wordRoot = await WordRoot.findOne({ name: root, meaning: meaning });
 
       if (!wordRoot) {
         wordRoot = new WordRoot();
         wordRoot.name = root;
         wordRoot.meaning = meaning;
         await wordRoot.save();
-
       } else {
         if (wordRoot.meaning !== meaning) {
           wordRoot.meaning = meaning;
@@ -72,18 +70,17 @@ export class WordsService {
         }
       }
 
-      for (let leaf in leafs) {
-        let { inlist, wordform, meaning } = leafs[leaf];
+      for (const leaf in leafs) {
+        let { wordform, meaning } = leafs[leaf];
+        const { inlist } = leafs[leaf];
 
-        wordform = wordform
-          .replace(/<em>|<\/em>/gi, '');
+        wordform = wordform.replace(/<em>|<\/em>/gi, '');
 
-        meaning = meaning
-          .replace(/<em>|<\/em>/gi, '');
+        meaning = meaning.replace(/<em>|<\/em>/gi, '');
 
         let word = await Word.findOne({
-          name: wordform
-        })
+          name: wordform,
+        });
 
         if (!word) {
           word = new Word();
@@ -92,21 +89,19 @@ export class WordsService {
           word.membean = inlist;
           word.wordRoots = [wordRoot];
           await word.save();
-
         } else {
-          let wordWithRoot = await Word.createQueryBuilder("word")
-            .leftJoinAndSelect("word.wordRoots", "wordRoot")
-            .where("word.name = :name", { name: wordform })
-            .andWhere("wordRoot.id = :id", { id: wordRoot.id })
+          const wordWithRoot = await Word.createQueryBuilder('word')
+            .leftJoinAndSelect('word.wordRoots', 'wordRoot')
+            .where('word.name = :name', { name: wordform })
+            .andWhere('wordRoot.id = :id', { id: wordRoot.id })
             .getOne();
 
           if (!wordWithRoot) {
             await getConnection()
               .createQueryBuilder()
-              .relation(Word, "wordRoots")
+              .relation(Word, 'wordRoots')
               .of(word)
-              .add(wordRoot)
-
+              .add(wordRoot);
           } else {
             if (wordWithRoot.definition !== meaning) {
               wordWithRoot.definition = meaning;
@@ -120,12 +115,12 @@ export class WordsService {
     return membeanWords;
   }
 
-  async getWordsByLetter(letter: string, pageNumber: number = 1, user: User): Promise<Object> {
-    letter = letter.toUpperCase()
+  async getWordsByLetter(letter: string, pageNumber = 1, user: User) {
+    letter = letter.toUpperCase();
 
     const maxPerPage = 10;
 
-    const [words, count] = await Word.createQueryBuilder( 'word')
+    const [words, count] = await Word.createQueryBuilder('word')
       .leftJoinAndSelect('word.wordRoots', 'wordRoot')
       .leftJoinAndSelect('word.userWords', 'userWord')
       .leftJoinAndSelect('userWord.user', 'user')
@@ -133,12 +128,11 @@ export class WordsService {
       .orderBy('word.name', 'ASC')
       .skip(maxPerPage * (pageNumber - 1))
       .take(maxPerPage)
-      .getManyAndCount()
+      .getManyAndCount();
 
-    const wordsByLetter = words.map(item => {
-
-      const userWords = item.userWords
-      let addWord: boolean = true
+    const wordsByLetter = words.map((item) => {
+      const userWords = item.userWords;
+      let addWord = true;
 
       for (const userWord of userWords) {
         if (userWord.user.id === user.id) {
@@ -147,17 +141,17 @@ export class WordsService {
         }
       }
 
-      delete item.userWords
-      item['addWord'] = addWord
+      delete item.userWords;
+      item['addWord'] = addWord;
 
-      return item
-    })
+      return item;
+    });
 
-    const pagesCount = Math.ceil(count / maxPerPage)
+    const pagesCount = Math.ceil(count / maxPerPage);
 
-    const pages: object[] = getPaginationPages(pagesCount, pageNumber)
+    const pages: PaginationPages = getPaginationPages(pagesCount, pageNumber);
 
-    const pagination: object = getPagination(pagesCount, pageNumber)
+    const pagination: Pagination = getPagination(pagesCount, pageNumber);
 
     return {
       words: wordsByLetter,
@@ -168,13 +162,17 @@ export class WordsService {
     };
   }
 
-  async addWordToUser(wordId: string, user: User, letter: string, pageNumber: number): Promise<Object> {
-
-    const word = await Word.findOne(wordId)
+  async addWordToUser(
+    wordId: string,
+    user: User,
+    letter: string,
+    pageNumber: number,
+  ) {
+    const word = await Word.findOne(wordId);
     const inputDate: Date = new Date();
 
     const userWord = new UserWord();
-    userWord.wordStatus = Status.ACTIVE
+    userWord.wordStatus = Status.ACTIVE;
     userWord.lastUpdatedDate = inputDate;
     userWord.repetitionDate = inputDate;
     userWord.repetitionTime = RepetitionTime.IMMEDIATELLY;
@@ -190,37 +188,44 @@ export class WordsService {
     log.word = word;
     await log.save();
 
-    return await this.getWordsByLetter(letter, pageNumber, user)
+    return this.getWordsByLetter(letter, pageNumber, user);
   }
 
-  async deleteUserWord(wordId: string, user: User, letter: string, pageNumber: number): Promise<Object> {
+  async deleteUserWord(
+    wordId: string,
+    user: User,
+    letter: string,
+    pageNumber: number,
+  ) {
+    const word = await Word.findOne(wordId);
 
-    const word = await Word.findOne(wordId)
-
-    const currentWordRepetitionTime = await UserWord.createQueryBuilder('userWord')
+    const currentWordRepetitionTime = await UserWord.createQueryBuilder(
+      'userWord',
+    )
       .select('userWord.repetitionTime')
-      .where("userWord.wordId = :wordId", {wordId: `${wordId}`})
-      .andWhere("userWord.userId = :userId", {userId: `${user.id}`})
-      .getOne()
+      .where('userWord.wordId = :wordId', { wordId: `${wordId}` })
+      .andWhere('userWord.userId = :userId', { userId: `${user.id}` })
+      .getOne();
 
-    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime.repetitionTime]
+    const wordRepetitionTime: string =
+      RepetitionTime[currentWordRepetitionTime.repetitionTime];
 
     await getConnection()
       .createQueryBuilder()
       .delete()
       .from(UserWord)
-      .where("wordId = :wordId", {wordId: `${wordId}`})
-      .andWhere("userId = :userId", {userId: `${user.id}`})
+      .where('wordId = :wordId', { wordId: `${wordId}` })
+      .andWhere('userId = :userId', { userId: `${user.id}` })
       .execute();
 
     const log = new Log();
     log.actionDate = new Date();
     log.actionType = ActionType.DELETION;
-    log.repetitionTime = RepetitionTime[wordRepetitionTime]
+    log.repetitionTime = RepetitionTime[wordRepetitionTime];
     log.user = user;
     log.word = word;
     await log.save();
 
-    return await this.getWordsByLetter(letter, pageNumber, user)
+    return await this.getWordsByLetter(letter, pageNumber, user);
   }
 }

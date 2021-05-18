@@ -8,32 +8,30 @@ import { WordRoot } from './entities/word-root.entity';
 
 @Injectable()
 export class RootsService {
-  async getRootWords(): Promise<Object[]> {
-
+  async getRootWords() {
     const rootWords = await WordRoot.createQueryBuilder('wordRoot')
       .leftJoin('wordRoot.words', 'word')
       .select('wordRoot.name, wordRoot.meaning, wordRoot.id')
-      .addSelect("COUNT(word.id) as word_count")
+      .addSelect('COUNT(word.id) as word_count')
       .groupBy('wordRoot.id')
       .orderBy("TRANSLATE(wordRoot.name, '-', '')", 'ASC')
-      .getRawMany()
+      .getRawMany();
 
-    return rootWords
+    return rootWords;
   }
 
-  async getWordsByRoot(wordRoot: string, user: User,  rootId: string): Promise<Object> {
-    const words = await Word.createQueryBuilder( 'word')
+  async getWordsByRoot(wordRoot: string, user: User, rootId: string) {
+    const words = await Word.createQueryBuilder('word')
       .leftJoin('word.wordRoots', 'wordRoot')
       .leftJoinAndSelect('word.userWords', 'userWord')
       .leftJoinAndSelect('userWord.user', 'user')
-      .where('wordRoot.id = :id', {id: `${rootId}`})
+      .where('wordRoot.id = :id', { id: `${rootId}` })
       .orderBy('LOWER(word.name)', 'ASC')
-      .getMany()
+      .getMany();
 
-    const wordsByRoot = words.map(item => {
-
-      const userWords = item.userWords
-      let addWord: boolean = true
+    const wordsByRoot = words.map((item) => {
+      const userWords = item.userWords;
+      let addWord = true;
 
       for (const userWord of userWords) {
         if (userWord.user.id === user.id) {
@@ -42,13 +40,13 @@ export class RootsService {
         }
       }
 
-      delete item.userWords
-      item['addWord'] = addWord
+      delete item.userWords;
+      item['addWord'] = addWord;
 
-      return item
-    })
+      return item;
+    });
 
-    const wordRootMeaning = await WordRoot.findOne(rootId)
+    const wordRootMeaning = await WordRoot.findOne(rootId);
 
     return {
       words: wordsByRoot,
@@ -57,14 +55,18 @@ export class RootsService {
     };
   }
 
-  async addWordToUser(wordRoot: string, wordId: string, user: User, rootId: string): Promise<Object> {
-
-    const word = await Word.findOne(wordId)
+  async addWordToUser(
+    wordRoot: string,
+    wordId: string,
+    user: User,
+    rootId: string,
+  ) {
+    const word = await Word.findOne(wordId);
 
     const inputDate: Date = new Date();
 
     const userWord = new UserWord();
-    userWord.wordStatus = Status.ACTIVE
+    userWord.wordStatus = Status.ACTIVE;
     userWord.lastUpdatedDate = inputDate;
     userWord.repetitionDate = inputDate;
     userWord.word = word;
@@ -82,21 +84,29 @@ export class RootsService {
     return await this.getWordsByRoot(wordRoot, user, rootId);
   }
 
-  async deleteUserWord(wordRoot: string, wordId: string, user: User, rootId: string): Promise<Object> {
-    const word = await Word.findOne(wordId)
+  async deleteUserWord(
+    wordRoot: string,
+    wordId: string,
+    user: User,
+    rootId: string,
+  ) {
+    const word = await Word.findOne(wordId);
 
-    const currentWordRepetitionTime = await UserWord.createQueryBuilder( 'userWord')
+    const currentWordRepetitionTime = await UserWord.createQueryBuilder(
+      'userWord',
+    )
       .select('userWord.repetitionTime')
-      .where("userWord.wordId = :wordId", {wordId: `${wordId}`})
-      .andWhere("userWord.userId = :userId", {userId: `${user.id}`})
-      .getOne()
+      .where('userWord.wordId = :wordId', { wordId: `${wordId}` })
+      .andWhere('userWord.userId = :userId', { userId: `${user.id}` })
+      .getOne();
 
-    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime.repetitionTime]
+    const wordRepetitionTime: string =
+      RepetitionTime[currentWordRepetitionTime.repetitionTime];
 
     const log = new Log();
     log.actionDate = new Date();
     log.actionType = ActionType.DELETION;
-    log.repetitionTime = RepetitionTime[wordRepetitionTime]
+    log.repetitionTime = RepetitionTime[wordRepetitionTime];
     log.user = user;
     log.word = word;
     await log.save();
@@ -105,11 +115,10 @@ export class RootsService {
       .createQueryBuilder()
       .delete()
       .from(UserWord)
-      .where("wordId = :wordId", {wordId: `${wordId}`})
-      .andWhere("userId = :userId", {userId: `${user.id}`})
+      .where('wordId = :wordId', { wordId: `${wordId}` })
+      .andWhere('userId = :userId', { userId: `${user.id}` })
       .execute();
 
-    return await this.getWordsByRoot(wordRoot, user, rootId)
+    return await this.getWordsByRoot(wordRoot, user, rootId);
   }
-
 }

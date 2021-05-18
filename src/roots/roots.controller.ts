@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Render, UseFilters, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Render,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserObj } from 'src/decorators/user-obj.decorator';
 import { AuthExceptionFilter } from 'src/filters/auth-exceptions.filter';
@@ -25,12 +34,21 @@ export class RootsController {
     @Param('rootId') rootId: string,
   ) {
     if (body.hasOwnProperty('add')) {
-      return await this.rootsService.addWordToUser(wordRoot, body['add'], user, rootId);
+      return await this.rootsService.addWordToUser(
+        wordRoot,
+        body['add'],
+        user,
+        rootId,
+      );
     } else if (body.hasOwnProperty('del')) {
-      return await this.rootsService.deleteUserWord(wordRoot, body['del'], user, rootId);
+      return await this.rootsService.deleteUserWord(
+        wordRoot,
+        body['del'],
+        user,
+        rootId,
+      );
     } else if (body.hasOwnProperty('id')) {
       return await this.rootsService.getWordsByRoot(wordRoot, user, rootId);
     }
   }
-
 }

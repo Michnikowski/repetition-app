@@ -9,8 +9,8 @@ import { ActionType, Log } from './entities/log.entity';
 @Injectable()
 export class UsersService {
   filter(user: User): RegisterUserResponse {
-    const {id, email} = user;
-    return {id, email};
+    const { id, email } = user;
+    return { id, email };
   }
 
   async register(newUser: RegisterDto, res: Response): Promise<any> {
@@ -19,8 +19,8 @@ export class UsersService {
       user.email = newUser.email;
       user.firstName = newUser.firstName;
       user.lastName = newUser.lastName;
-      user.isActive = true
-      user.role = UserRole.USER
+      user.isActive = true;
+      user.role = UserRole.USER;
       user.pwdHash = hashPwd(newUser.pwd);
       await user.save();
 
@@ -30,10 +30,9 @@ export class UsersService {
       log.user = user;
       await log.save();
 
-      return res.redirect('/users/login')
+      return res.redirect('/users/login');
     } catch (e) {
-      return res.render('register', {registerError: true})
+      return res.render('register', { registerError: true });
     }
   }
-
 }

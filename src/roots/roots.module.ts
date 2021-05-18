@@ -4,6 +4,6 @@ import { RootsController } from './roots.controller';
 
 @Module({
   controllers: [RootsController],
-  providers: [RootsService]
+  providers: [RootsService],
 })
 export class RootsModule {}

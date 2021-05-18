@@ -6,7 +6,6 @@ import { AuthExceptionFilter } from './filters/auth-exceptions.filter';
 @UseGuards(AuthGuard('jwt'))
 @UseFilters(AuthExceptionFilter)
 export class AppController {
-
   constructor(private readonly appService: AppService) {}
 
   @Get('/')
@@ -15,5 +14,4 @@ export class AppController {
   async getAlphabet() {
     return await this.appService.getAlphabet();
   }
-
 }

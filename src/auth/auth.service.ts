@@ -10,15 +10,17 @@ import { ActionType, Log } from 'src/users/entities/log.entity';
 
 @Injectable()
 export class AuthService {
-  private createToken(currentTokenId: string): {accessToken: string, expiresIn: number} {
+  private createToken(
+    currentTokenId: string,
+  ): { accessToken: string; expiresIn: number } {
     const payload: JwtPayload = { id: currentTokenId };
     const expiresIn = 60 * 60 * 24;
     const accessToken = sign(payload, process.env.SECRET, { expiresIn });
     return {
-        accessToken,
-        expiresIn,
+      accessToken,
+      expiresIn,
     };
-  };
+  }
 
   private async generateToken(user: User): Promise<string> {
     let token;
@@ -31,7 +33,7 @@ export class AuthService {
     await user.save();
 
     return token;
-  };
+  }
 
   async login(req: AuthLoginDto, res: Response): Promise<any> {
     try {
@@ -41,7 +43,7 @@ export class AuthService {
       });
 
       if (!user) {
-        return res.render('login', {userError: true});
+        return res.render('login', { userError: true });
       }
 
       const token = await this.createToken(await this.generateToken(user));
@@ -58,14 +60,13 @@ export class AuthService {
           domain: 'localhost',
           httpOnly: true,
         })
-        .redirect('/')
+        .redirect('/');
     } catch (e) {
-      return res.render('login', {userError: true});
+      return res.render('login', { userError: true });
     }
-  };
+  }
 
   async logout(user: User, res: Response) {
-
     const log = new Log();
     log.actionDate = new Date();
     log.actionType = ActionType.LOGOUT;
@@ -73,18 +74,15 @@ export class AuthService {
     await log.save();
 
     try {
-        user.currentTokenId = null;
-        await user.save();
-        res.clearCookie(
-            'jwt',
-            {
-                secure: false,
-                domain: 'localhost',
-                httpOnly: true,
-            }
-        );
+      user.currentTokenId = null;
+      await user.save();
+      res.clearCookie('jwt', {
+        secure: false,
+        domain: 'localhost',
+        httpOnly: true,
+      });
     } catch (e) {
-        return console.log(e);
+      return console.log(e);
     }
   }
 }

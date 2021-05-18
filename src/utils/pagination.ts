@@ -1,17 +1,20 @@
-export function getPaginationPages(pagesCount: number, pageNumber: number) {
+import { Pagination } from 'src/interfaces/pagination';
+import { PaginationPages } from 'src/interfaces/pagination-page';
 
-  if (pagesCount < 2 ) return []
+export function getPaginationPages(
+  pagesCount: number,
+  pageNumber: number,
+): PaginationPages {
+  if (pagesCount < 2) return [];
 
-  const pages: Object[] = [];
+  const pages: PaginationPages = [];
 
   if (pagesCount <= 3) {
     for (let i = 1; i <= pagesCount; i++) {
-      pages.push(
-      {
-          pageNumber: i,
-          activePage: i === pageNumber
-        }
-      )
+      pages.push({
+        pageNumber: i,
+        activePage: i === pageNumber,
+      });
     }
   } else {
     let i: number;
@@ -28,28 +31,28 @@ export function getPaginationPages(pagesCount: number, pageNumber: number) {
       stop = pageNumber + 1;
     }
 
-    for (i; i <= stop; i++ ) {
-      pages.push(
-        {
-          pageNumber: i,
-          activePage: i === pageNumber
-        }
-      )
+    for (i; i <= stop; i++) {
+      pages.push({
+        pageNumber: i,
+        activePage: i === pageNumber,
+      });
     }
   }
-  return pages
+  return pages;
 }
 
-export function getPagination(pagesCount: number, pageNumber: number) {
-
-  if (pagesCount < 2 ) {
-    return {}
+export function getPagination(
+  pagesCount: number,
+  pageNumber: number,
+): Pagination {
+  if (pagesCount < 2) {
+    return {};
   } else {
     return {
       prev: pageNumber > 1 ? pageNumber - 1 : 1,
       next: pageNumber < pagesCount ? pageNumber + 1 : pagesCount,
       first: 1,
       last: pagesCount,
-    }
+    };
   }
 }

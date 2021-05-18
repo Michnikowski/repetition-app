@@ -1,4 +1,4 @@
 export class UpdateUserWordDto {
-    wordId: string;
-    repetitionTime: string;
+  wordId: string;
+  repetitionTime: string;
 }

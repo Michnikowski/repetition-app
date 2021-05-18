@@ -1,10 +1,18 @@
-import { User } from "src/users/entities/user.entity";
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { Word } from "./word.entity";
+import { User } from 'src/users/entities/user.entity';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+import { Word } from './word.entity';
 
 export enum Status {
-  ACTIVE = "active",
-  INACTIVE = "inactive"
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
 }
 
 export enum RepetitionTime {
@@ -13,54 +21,52 @@ export enum RepetitionTime {
   IN_THREE_DAYS = 3,
   IN_SEVEN_DAYS = 7,
   IN_FOURTEEN_DAYS = 14,
-  IN_SIXTY_DAYS = 60
+  IN_SIXTY_DAYS = 60,
 }
 
 @Entity()
-@Unique(["word", "user"])
+@Unique(['word', 'user'])
 export class UserWord extends BaseEntity {
-
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({
-  type: "enum",
-  enum: Status,
-  default: Status.ACTIVE
+    type: 'enum',
+    enum: Status,
+    default: Status.ACTIVE,
   })
-  wordStatus: Status
+  wordStatus: Status;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: RepetitionTime,
-    default: RepetitionTime.IMMEDIATELLY
+    default: RepetitionTime.IMMEDIATELLY,
   })
-  repetitionTime: RepetitionTime
+  repetitionTime: RepetitionTime;
 
   @Column({
     type: 'timestamptz',
-    nullable: true
+    nullable: true,
   })
   lastUpdatedDate: Date;
 
   @Column({
     type: 'date',
-    nullable: true
+    nullable: true,
   })
   repetitionDate: Date;
 
-  @ManyToOne(() => Word, word => word.userWords, {
+  @ManyToOne(() => Word, (word) => word.userWords, {
     cascade: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
   word: Word;
 
-  @ManyToOne(() => User, user => user.userWords, {
+  @ManyToOne(() => User, (user) => user.userWords, {
     cascade: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
   user: User;
-
 }

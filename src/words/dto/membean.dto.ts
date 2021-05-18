@@ -1,7 +1,7 @@
 export class MembeanWord {
-  root:  string;
-  meaning:  string;
-  leafs: object;
+  root: string;
+  meaning: string;
+  leafs: any;
 }
 
 export type GetWordsResponse = MembeanWord[];

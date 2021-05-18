@@ -21,11 +21,9 @@ import { RepetitionsModule } from './repetitions/repetitions.module';
     AdminModule,
     AuthModule,
     MywordsModule,
-    RepetitionsModule
+    RepetitionsModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -4,6 +4,6 @@ import { RepetitionsController } from './repetitions.controller';
 
 @Module({
   controllers: [RepetitionsController],
-  providers: [RepetitionsService]
+  providers: [RepetitionsService],
 })
 export class RepetitionsModule {}

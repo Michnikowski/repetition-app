@@ -1,23 +1,30 @@
-import { UserWord } from "src/words/entities/user-word.entity";
-import { BaseEntity, Column, Entity, Index, JoinColumn, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Log } from "./log.entity";
+import { UserWord } from 'src/words/entities/user-word.entity';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Log } from './log.entity';
 
 export enum UserRole {
-  ADMIN = "admin",
-  USER = "user"
+  ADMIN = 'admin',
+  USER = 'user',
 }
 @Entity()
-export class User extends BaseEntity{
-
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: UserRole,
-    default: UserRole.USER
+    default: UserRole.USER,
   })
-  role: UserRole
+  role: UserRole;
 
   @Column({
     nullable: false,
@@ -32,7 +39,7 @@ export class User extends BaseEntity{
   lastName: string;
 
   @Index({
-    unique:true,
+    unique: true,
   })
   @Column({
     nullable: false,
@@ -54,11 +61,11 @@ export class User extends BaseEntity{
   })
   currentTokenId: string | null;
 
-  @OneToMany(() => UserWord, userWord => userWord.user)
+  @OneToMany(() => UserWord, (userWord) => userWord.user)
   @JoinColumn()
   userWords: UserWord[];
 
-  @OneToMany(() => Log, log => log.user)
+  @OneToMany(() => Log, (log) => log.user)
   @JoinColumn()
   logs: Log[];
 }

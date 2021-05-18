@@ -18,10 +18,13 @@ export class UsersController {
 
   @Get('/register')
   @Render('register')
-  registerPage(){}
+  registerPage() {
+    return;
+  }
 
   @Get('/login')
   @Render('login')
-  loginPage(){}
-
+  loginPage() {
+    return;
+  }
 }

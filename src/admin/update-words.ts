@@ -1,8 +1,8 @@
-import { Definition } from "src/words/entities/definition.entity";
-import { Example } from "src/words/entities/example.entity";
-import { WordFunction } from "src/words/entities/word-function.entity";
-import { Word } from "src/words/entities/word.entity";
-import { fetchData } from "./fetch-data";
+import { Definition } from 'src/words/entities/definition.entity';
+import { Example } from 'src/words/entities/example.entity';
+import { WordFunction } from 'src/words/entities/word-function.entity';
+import { Word } from 'src/words/entities/word.entity';
+import { fetchData } from './fetch-data';
 
 export async function updateWords(words: Word[]) {
   let countWords: number;
@@ -11,27 +11,27 @@ export async function updateWords(words: Word[]) {
   let exampleEntity: Example;
 
   for (const word of words) {
-    let wordName: string
-    if (word.name.includes("(")){
-      wordName = word.name.slice(0, word.name.indexOf("("))
+    let wordName: string;
+    if (word.name.includes('(')) {
+      wordName = word.name.slice(0, word.name.indexOf('('));
     } else {
-      wordName = word.name
+      wordName = word.name;
     }
 
-    let data = await fetchData(wordName);
+    const data = await fetchData(wordName);
 
     if (!data) continue;
 
     try {
       if (data.phonetics.length) {
-        let phonetics = data.phonetics[0];
+        const phonetics = data.phonetics[0];
 
         if (phonetics.text !== undefined) {
-          word.phoneticNotation = phonetics.text
+          word.phoneticNotation = phonetics.text;
         }
 
         if (phonetics.audio !== undefined) {
-          word.audioUrl = phonetics.audio
+          word.audioUrl = phonetics.audio;
         }
 
         await word.save();
@@ -39,28 +39,32 @@ export async function updateWords(words: Word[]) {
 
       if (!data.meanings.length) continue;
 
-      let meanings = data.meanings;
+      const meanings = data.meanings;
 
       for (const meaning of meanings) {
         if (meaning.partOfSpeech === undefined) continue;
         if (!meaning.definitions.length) continue;
 
-        let { partOfSpeech, definitions } = meaning;
+        const { partOfSpeech, definitions } = meaning;
 
         for (const item of definitions) {
           if (item.definition !== undefined) {
-            let { definition } = item;
+            const { definition } = item;
 
             countWords = await Word.createQueryBuilder('word')
               .leftJoin('word.wordFunctions', 'wordFunction')
               .leftJoin('wordFunction.definitions', 'definition')
               .where('word.id = :id', { id: word.id })
-              .andWhere('wordFunction.function = :function', { function: partOfSpeech })
-              .andWhere('definition.definement = :definement', { definement: definition })
+              .andWhere('wordFunction.function = :function', {
+                function: partOfSpeech,
+              })
+              .andWhere('definition.definement = :definement', {
+                definement: definition,
+              })
               .getCount();
 
             if (!countWords) {
-              wordFunction = await getWordFunction(word, partOfSpeech)
+              wordFunction = await getWordFunction(word, partOfSpeech);
 
               definitionEntity = new Definition();
               definitionEntity.definement = definition;
@@ -70,18 +74,20 @@ export async function updateWords(words: Word[]) {
           }
 
           if (item.example !== undefined) {
-            let { example } = item;
+            const { example } = item;
 
             countWords = await Word.createQueryBuilder('word')
               .leftJoin('word.wordFunctions', 'wordFunction')
               .leftJoin('wordFunction.examples', 'example')
               .where('word.id = :id', { id: word.id })
-              .andWhere('wordFunction.function = :function', { function: partOfSpeech })
+              .andWhere('wordFunction.function = :function', {
+                function: partOfSpeech,
+              })
               .andWhere('example.usage = :usage', { usage: example })
               .getCount();
 
             if (!countWords) {
-              wordFunction = await getWordFunction(word, partOfSpeech)
+              wordFunction = await getWordFunction(word, partOfSpeech);
 
               exampleEntity = new Example();
               exampleEntity.usage = example;
@@ -97,8 +103,11 @@ export async function updateWords(words: Word[]) {
   }
 }
 
-async function getWordFunction(word: Word, partOfSpeech: string): Promise<WordFunction> {
-  let wordFunction = await WordFunction.createQueryBuilder( 'wordFunction' )
+async function getWordFunction(
+  word: Word,
+  partOfSpeech: string,
+): Promise<WordFunction> {
+  let wordFunction = await WordFunction.createQueryBuilder('wordFunction')
     .leftJoinAndSelect('wordFunction.word', 'word')
     .where('word.id = :id', { id: word.id })
     .andWhere('wordFunction.function = :function', { function: partOfSpeech })
@@ -111,5 +120,5 @@ async function getWordFunction(word: Word, partOfSpeech: string): Promise<WordFu
     await wordFunction.save();
   }
 
-  return wordFunction
+  return wordFunction;
 }

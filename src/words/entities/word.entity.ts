@@ -1,13 +1,22 @@
-import { WordInterface } from "src/interfaces/word";
-import { BaseEntity, Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { WordFunction } from "./word-function.entity";
-import { WordRoot } from "../../roots/entities/word-root.entity";
-import { UserWord } from "./user-word.entity";
-import { Log } from "src/users/entities/log.entity";
+import { WordInterface } from 'src/interfaces/word';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { WordFunction } from './word-function.entity';
+import { WordRoot } from '../../roots/entities/word-root.entity';
+import { UserWord } from './user-word.entity';
+import { Log } from 'src/users/entities/log.entity';
 
 @Entity()
 export class Word extends BaseEntity implements WordInterface {
-
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -22,7 +31,7 @@ export class Word extends BaseEntity implements WordInterface {
   membean: boolean;
 
   @Column({
-    type: "text",
+    type: 'text',
     nullable: true,
   })
   audioUrl: string;
@@ -32,20 +41,19 @@ export class Word extends BaseEntity implements WordInterface {
   })
   phoneticNotation: string;
 
-  @ManyToMany(() => WordRoot, wordRoot => wordRoot.words)
+  @ManyToMany(() => WordRoot, (wordRoot) => wordRoot.words)
   @JoinTable()
   wordRoots: WordRoot[];
 
-  @OneToMany(() => WordFunction, wordFunction => wordFunction.word)
+  @OneToMany(() => WordFunction, (wordFunction) => wordFunction.word)
   @JoinColumn()
   wordFunctions: WordFunction[];
 
-  @OneToMany(() => UserWord, userWord => userWord.word)
+  @OneToMany(() => UserWord, (userWord) => userWord.word)
   @JoinColumn()
   userWords: UserWord[];
 
-  @OneToMany(() => Log, log => log.word)
+  @OneToMany(() => Log, (log) => log.word)
   @JoinColumn()
   logs: Log[];
-
 }

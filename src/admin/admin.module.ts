@@ -5,9 +5,6 @@ import { WordsService } from 'src/words/words.service';
 
 @Module({
   controllers: [AdminController],
-  providers: [
-    AdminService,
-    WordsService,
-  ]
+  providers: [AdminService, WordsService],
 })
 export class AdminModule {}

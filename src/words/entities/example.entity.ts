@@ -1,18 +1,24 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { WordFunction } from "./word-function.entity";
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { WordFunction } from './word-function.entity';
 
 @Entity()
 export class Example extends BaseEntity {
-
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({
-    type: "text",
+    type: 'text',
   })
   usage: string;
 
-  @ManyToOne(() => WordFunction, wordFunction => wordFunction.examples, {
+  @ManyToOne(() => WordFunction, (wordFunction) => wordFunction.examples, {
     cascade: true,
     onDelete: 'CASCADE',
   })

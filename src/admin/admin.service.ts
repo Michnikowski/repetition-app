@@ -11,7 +11,7 @@ export class AdminService {
       .orderBy('word.name', 'ASC')
       .getMany();
 
-    updateWords(words)
+    updateWords(words);
   }
 
   async addMissingWordDefinitions() {
@@ -22,7 +22,6 @@ export class AdminService {
       .orderBy('word.name', 'ASC')
       .getMany();
 
-    updateWords(words)
+    updateWords(words);
   }
-
 }

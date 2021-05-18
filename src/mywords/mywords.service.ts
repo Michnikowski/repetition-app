@@ -1,15 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { RandomWords } from 'src/interfaces/my-word';
+import { Pagination } from 'src/interfaces/pagination';
+import { PaginationPages } from 'src/interfaces/pagination-page';
 import { ActionType, Log } from 'src/users/entities/log.entity';
 import { User } from 'src/users/entities/user.entity';
 import { getPagination, getPaginationPages } from 'src/utils/pagination';
-import { Status, UserWord, RepetitionTime } from 'src/words/entities/user-word.entity';
+import {
+  Status,
+  UserWord,
+  RepetitionTime,
+} from 'src/words/entities/user-word.entity';
 import { Word } from 'src/words/entities/word.entity';
 import { getConnection } from 'typeorm';
+import { SingleWordDto } from './dto/single-word.dto';
 
 @Injectable()
 export class MywordsService {
-
-  async findAllUserWords(user: User, pageNumber: number = 1): Promise<Object> {
+  async findAllUserWords(user: User, pageNumber = 1) {
     const maxPerPage = 48;
 
     const [userWords, count] = await Word.createQueryBuilder('word')
@@ -18,13 +25,13 @@ export class MywordsService {
       .orderBy('word.name', 'ASC')
       .skip(maxPerPage * (pageNumber - 1))
       .take(maxPerPage)
-      .getManyAndCount()
+      .getManyAndCount();
 
-    const pagesCount = Math.ceil(count / maxPerPage)
+    const pagesCount = Math.ceil(count / maxPerPage);
 
-    const pages: object[] = getPaginationPages(pagesCount, pageNumber)
+    const pages: PaginationPages = getPaginationPages(pagesCount, pageNumber);
 
-    const pagination: object = getPagination(pagesCount, pageNumber)
+    const pagination: Pagination = getPagination(pagesCount, pageNumber);
 
     return {
       words: userWords,
@@ -34,77 +41,80 @@ export class MywordsService {
     };
   }
 
-  async findSingleWord(body): Promise<Object> {
-    const word = await Word.createQueryBuilder( 'word')
+  async findSingleWord(singleWord: SingleWordDto) {
+    const word = await Word.createQueryBuilder('word')
       .leftJoinAndSelect('word.wordFunctions', 'wordFunction')
       .leftJoinAndSelect('wordFunction.definitions', 'definition')
       .leftJoinAndSelect('wordFunction.examples', 'example')
-      .where(`word.id = '${body.id}'`)
-      .getOne()
+      .where(`word.id = '${singleWord.id}'`)
+      .getOne();
 
-    return word
+    return word;
   }
 
   async deleteUserWord(user: User, wordId: string) {
-    const word = await Word.findOne(wordId)
+    const word = await Word.findOne(wordId);
 
-    const currentWordRepetitionTime = await UserWord.createQueryBuilder('userWord')
+    const currentWordRepetitionTime = await UserWord.createQueryBuilder(
+      'userWord',
+    )
       .select('userWord.repetitionTime')
-      .where("userWord.wordId = :wordId", {wordId: `${wordId}`})
-      .andWhere("userWord.userId = :userId", {userId: `${user.id}`})
-      .getOne()
+      .where('userWord.wordId = :wordId', { wordId: `${wordId}` })
+      .andWhere('userWord.userId = :userId', { userId: `${user.id}` })
+      .getOne();
 
-    const wordRepetitionTime: string = RepetitionTime[currentWordRepetitionTime.repetitionTime]
+    const wordRepetitionTime: string =
+      RepetitionTime[currentWordRepetitionTime.repetitionTime];
 
     await getConnection()
       .createQueryBuilder()
       .delete()
       .from(UserWord)
-      .where("wordId = :wordId", { wordId })
-      .andWhere("userId = :userId", { userId: `${user.id}` })
+      .where('wordId = :wordId', { wordId })
+      .andWhere('userId = :userId', { userId: `${user.id}` })
       .execute();
 
     const log = new Log();
     log.actionDate = new Date();
     log.actionType = ActionType.DELETION;
-    log.repetitionTime = RepetitionTime[wordRepetitionTime]
+    log.repetitionTime = RepetitionTime[wordRepetitionTime];
     log.user = user;
     log.word = word;
     await log.save();
   }
 
-  async appendRandomWords(user: User): Promise<Object> {
-    const userWordIds = await Word.createQueryBuilder( 'word')
+  async appendRandomWords(user: User): Promise<RandomWords> {
+    const userWordIds = await Word.createQueryBuilder('word')
       .select('word.id')
       .innerJoin('word.userWords', 'userWords')
       .where(`userWords.userId = '${user.id}'`)
-      .getMany()
+      .getMany();
 
     const userWordIdsArray: Array<string> = [];
 
     for (const word of userWordIds) {
-      userWordIdsArray.push(word.id)
+      userWordIdsArray.push(word.id);
     }
 
-    let wordsToAdd: Word[]
+    let wordsToAdd: Word[];
 
-    if (userWordIdsArray.length > 0){
+    if (userWordIdsArray.length > 0) {
       wordsToAdd = await Word.createQueryBuilder('word')
         .where('word.id NOT IN (:...ids)', { ids: userWordIdsArray })
         .orderBy('random()', 'ASC')
         .take(10)
-        .getMany()
+        .getMany();
     } else {
-      wordsToAdd = await Word.createQueryBuilder( 'word')
+      wordsToAdd = await Word.createQueryBuilder('word')
         .orderBy('random()', 'ASC')
         .take(10)
-        .getMany()
+        .getMany();
     }
 
     const inputDate: Date = new Date();
 
     for (const word of wordsToAdd) {
-      const singleWord = await Word.findOne(word.id)
+      const singleWord = await Word.findOne(word.id);
       const userWord = new UserWord();
 
       userWord.wordStatus = Status.ACTIVE;
@@ -125,8 +135,7 @@ export class MywordsService {
     }
 
     return {
-      words: wordsToAdd
-    }
+      words: wordsToAdd,
+    };
   }
-
 }
