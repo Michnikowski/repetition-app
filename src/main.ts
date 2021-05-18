@@ -12,6 +12,9 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   hbs.registerPartials(join(__dirname, '..', 'views/partials'));
+  hbs.registerHelper('replaceSpaces', function (input) {
+    return input.replace(' ', '');
+  });
   app.setViewEngine('hbs');
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());

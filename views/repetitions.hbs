@@ -1,76 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  {{> head}}
+{{> head}}
 
-  <body>
-
-    <div class="container">
-      {{> navbar}}
+<body>
+  <div class="container">
+    {{> navbar}}
+    <br>
+    <div class="container-fluid text-center">
       <br>
-      <div class="container-fluid text-center">
-        {{#unless noWordsToRepetition}}
-        <div class="form-row">
-          <form action="/mywords/word/{{repetitionWord.name}}" method="post">
-            <button class="btn btn-outline-secondary" name="id" value="{{repetitionWord.id}}">Details</button>
-          </form>
-        </div>
-        {{/unless}}
-        <br>
-        <div class="row">
-          {{#if noWordsToRepetition}}
-          <br>
-          <br>
-          <div class="col display-5">{{noWordsToRepetition}}</div>
-          {{else}}
-          <div class="col display-5">{{repetitionWord.name}}</div>
-          {{/if}}
-        </div>
-        <br>
-        <br>
-        <div class="row">
-          <div class="col" style="font-size:25px">{{repetitionWord.definition}}</div>
-        </div>
-        <br>
+      <div class="row">
+        {{#if noWordsToRepetition}}
+        <div class="col display-5">{{noWordsToRepetition}}</div>
+        {{else}}
+        <div class="col display-5">{{repetitionWord.name}}</div>
+        {{/if}}
       </div>
-      <br>
-      <br>
       {{#unless noWordsToRepetition}}
-      <div class="row justify-content-center text-center">
-        <div class="col">
-          <h5>Phonetic notation</h5>
-        </div>
-        <div class="col">
-          <h5>Audio</h5>
-        </div>
-        <div class="col">
-          <h5>Video</h5>
-        </div>
-        <div class="col">
-          <h5>Membean</h5>
-        </div>
-      </div>
-      <div class="row justify-content-center text-center">
-        <div class="col">
-          <h4>{{repetitionWord.phoneticNotation}}</h4>
-        </div>
-        <div class="col">
-          {{#if repetitionWord.audioUrl}}
-            {{> audioUrl}}
-          {{/if}}
-        </div>
-        <div class="col">
-          {{> videoUrl}}
-        </div>
-        <div class="col"><h4>
-          {{#if repetitionWord.membean}}
-            Yes
-          {{else}}
-            No
-          {{/if}}
-          </h4>
-        </div>
-      </div>
+      <br>
+      <br>
+      {{> wordMedia}}
       <br>
       <br>
       <br>
@@ -79,31 +28,106 @@
         {{#each repetitionTime}}
         <div class="col">
           <form action="" method="POST">
-              <div class="col form-group btn-group btn-group-justified">
-                <button type="submit" class="btn {{this.btn}}">
-                  {{this.buttonDescription}}
-                  {{#if arrowDown}}
-                    {{> arrowDown}}
-                  {{/if}}
-                  {{#if arrowUp}}
-                    {{> arrowUp}}
-                  {{/if}}
-                  {{#if repeat}}
-                    {{> repeat}}
-                  {{/if}}
-                  {{#if wink}}
-                    {{> wink}}
-                  {{/if}}
-                </button>
-                <input type="hidden" name="wordId" value="{{this.wordId}}" />
-                <input type="hidden" name="repetitionTime" value="{{this.repetitionTime}}" />
-              </div>
+            <div class="col form-group btn-group btn-group-justified">
+              <button type="submit" class="btn {{this.btn}}">
+                {{this.buttonDescription}}
+                {{#if arrowDown}}
+                {{> arrowDown}}
+                {{/if}}
+                {{#if arrowUp}}
+                {{> arrowUp}}
+                {{/if}}
+                {{#if repeat}}
+                {{> repeat}}
+                {{/if}}
+                {{#if wink}}
+                {{> wink}}
+                {{/if}}
+              </button>
+              <input type="hidden" name="wordId" value="{{this.wordId}}" />
+              <input type="hidden" name="repetitionTime" value="{{this.repetitionTime}}" />
+            </div>
           </form>
         </div>
         {{/each}}
         <div class="col-sm-2"></div>
       </div>
+      <div class="bd-example">
+        <br>
+        <br>
+        <nav>
+          <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="generaldefinition-tab" data-bs-toggle="tab"
+                data-bs-target="#generaldefinition" type="button" role="tab" aria-controls="generaldefinition"
+                aria-selected="true" style="font-size:22px;">general</button>
+            </li>
+            {{#each repetitionWord.wordFunctions}}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="{{replaceSpaces this.function}}-tab" data-bs-toggle="tab"
+                data-bs-target="#{{replaceSpaces this.function}}" type="button" role="tab"
+                aria-controls="{{replaceSpaces this.function}}" aria-selected="false"
+                style="font-size:22px;">{{this.function}}</button>
+            </li>
+            {{/each}}
+          </ul>
+        </nav>
+        <br>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane active" id="generaldefinition" role="tabpanel" aria-labelledby="generaldefinition-tab">
+            <div class="row justify-content-center text-center">
+              <div class="col">
+                <p style="font-size:20px;">{{repetitionWord.definition}}</p>
+              </div>
+            </div>
+          </div>
+          {{#each repetitionWord.wordFunctions}}
+          <div class="tab-pane" id="{{replaceSpaces this.function}}" role="tabpanel"
+            aria-labelledby="{{replaceSpaces this.function}}-tab">
+            {{#if this.definitions}}
+            <div class="row justify-content-center text-center">
+              <div class="col">
+                <p style="font-size:22px;">Definitions</p>
+              </div>
+            </div>
+
+            {{#each this.definitions}}
+            <div class="row justify-content-center text-center">
+              <div class="col">
+                <p style="font-size:20px;"><i>{{this.definement}}</i></p>
+              </div>
+            </div>
+            {{/each}}
+
+            <br>
+
+            {{/if}}
+
+            {{#if this.examples}}
+            <div class="row justify-content-center text-center">
+              <div class="col">
+                <p style="font-size:22px;">Examples</p>
+              </div>
+            </div>
+
+            {{#each this.examples}}
+            <div class="row justify-content-center text-center">
+              <div class="col">
+                <p style="font-size:20px;"><i>{{this.usage}}</i></p>
+              </div>
+            </div>
+            {{/each}}
+
+            {{/if}}
+          </div>
+          {{/each}}
+        </div>
+      </div>
       {{/unless}}
+      <br>
     </div>
-  </body>
+    <br>
+  </div>
+</body>
+
 </html>
