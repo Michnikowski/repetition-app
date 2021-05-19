@@ -1,115 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  {{> head}}
+{{> head}}
 
-  <body>
-    <div class="container">
-      {{> navbar}}
-      <br>
-      <div class="row">
-        <div class="col d-flex justify-content-end">
-          <form action="/mywords/word/delete/{{this.id}}" method="get" name="del">
-            <button class="btn btn-outline-danger btn text-left" type="submit" name="id" value={{this.id}}>
-              {{> remove}}
-              Remove
-            </button>
-          </form>
-        </div>
+<body>
+  <div class="container">
+    {{> navbar}}
+    <br>
+    <div class="row">
+      <div class="col d-flex justify-content-end">
+        <form action="/mywords/word/delete/{{this.id}}" method="get" name="del">
+          <button class="btn btn-outline-danger btn text-left" type="submit" name="id" value={{this.id}}>
+            {{> remove}}
+            Remove
+          </button>
+        </form>
       </div>
-      <br>
-      <div class="row justify-content-center text-center">
-        <div class="col">
-          <div class="col display-5">{{this.name}}</div>
-        </div>
+    </div>
+    <br>
+    <div class="row justify-content-center text-center">
+      <div class="col">
+        <div class="col display-5">{{this.name}}</div>
       </div>
-      <br>
-      {{#if this.definition}}
-      <div class="row justify-content-center">
-        <div class="col text-center">
-          <h4><i>{{this.definition}}</i></h4>
-        </div>
+    </div>
+    <br>
+    {{#if this.definition}}
+    <div class="row justify-content-center">
+      <div class="col text-center">
+        <h4><i>{{this.definition}}</i></h4>
       </div>
-      <br>
-      <br>
-      {{/if}}
-      <div class="row justify-content-center text-center">
-        <div class="col">
-          <h5>Phonetic notation</h5>
-        </div>
-        <div class="col">
-          <h5>Audio</h5>
-        </div>
-        <div class="col">
-          <h5>Video</h5>
-        </div>
-        <div class="col">
-          <h5>Membean</h5>
-        </div>
+    </div>
+    <br>
+    <br>
+    {{/if}}
+    <div class="row justify-content-center text-center">
+      <div class="col">
+        <h5>Phonetic notation</h5>
       </div>
-      <div class="row justify-content-center text-center">
-        <div class="col">
-          <h3>{{this.phoneticNotation}}</h3>
-        </div>
-        <div class="col">
-          {{#if this.audioUrl}}
-            {{> audioUrl}}
-          {{/if}}
-        </div>
-        <div class="col">
-          {{> videoUrl}}
-        </div>
-        <div class="col"><h3>
+      <div class="col">
+        <h5>Audio</h5>
+      </div>
+      <div class="col">
+        <h5>Video</h5>
+      </div>
+      <div class="col">
+        <h5>Membean</h5>
+      </div>
+    </div>
+    <div class="row justify-content-center text-center">
+      <div class="col">
+        <h3>{{this.phoneticNotation}}</h3>
+      </div>
+      <div class="col">
+        {{#if this.audioUrl}}
+        {{> audioUrl}}
+        {{/if}}
+      </div>
+      <div class="col">
+        {{> videoUrl}}
+      </div>
+      <div class="col">
+        <h3>
           {{#if word.membean}}
-            Yes
+          Yes
           {{else}}
-            No
+          No
           {{/if}}
-          </h3>
-        </div>
+        </h3>
       </div>
+    </div>
+    <br>
+
+    <div class="bd-example">
       <br>
-      {{#each this.wordFunctions}}
-      <div class="row justify-content-center text-center">
-        <div class="col">
-          <h3>{{this.function}}</h3>
-          <br>
-          {{#if this.definitions}}
-            <div class="row justify-content-center text-center">
-              <div class="col">
-                <h5>Definitions</h5>
-              </div>
+      <nav>
+        <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="generaldefinition-tab" data-bs-toggle="tab"
+              data-bs-target="#generaldefinition" type="button" role="tab" aria-controls="generaldefinition"
+              aria-selected="true" style="font-size:22px;">general</button>
+          </li>
+          {{#each this.wordFunctions}}
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="{{replaceSpaces this.function}}-tab" data-bs-toggle="tab"
+              data-bs-target="#{{replaceSpaces this.function}}" type="button" role="tab"
+              aria-controls="{{replaceSpaces this.function}}" aria-selected="false"
+              style="font-size:22px;">{{this.function}}</button>
+          </li>
+          {{/each}}
+        </ul>
+      </nav>
+      <br>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane active" id="generaldefinition" role="tabpanel" aria-labelledby="generaldefinition-tab">
+          <div class="row justify-content-center text-center">
+            <div class="col">
+              <p style="font-size:20px;">{{this.definition}}</p>
             </div>
-            {{#each this.definitions}}
-              <div class="row justify-content-center text-center">
-                <div class="col">
-                  <h4><i>{{this.definement}}</i></h4>
-                </div>
-              </div>
-            {{/each}}
-            <br>
+          </div>
+        </div>
+        {{#each this.wordFunctions}}
+        <div class="tab-pane" id="{{replaceSpaces this.function}}" role="tabpanel"
+          aria-labelledby="{{replaceSpaces this.function}}-tab">
+          {{#if this.definitions}}
+          <div class="row justify-content-center text-center">
+            <div class="col">
+              <p style="font-size:22px;">Definitions</p>
+            </div>
+          </div>
+
+          {{#each this.definitions}}
+          <div class="row justify-content-center text-center">
+            <div class="col">
+              <p style="font-size:20px;"><i>{{this.definement}}</i></p>
+            </div>
+          </div>
+          {{/each}}
+
+          <br>
+
           {{/if}}
 
           {{#if this.examples}}
-            <div class="row justify-content-center text-center">
-              <div class="col">
-                <h5>Examples</h5>
-              </div>
+          <div class="row justify-content-center text-center">
+            <div class="col">
+              <p style="font-size:22px;">Examples</p>
             </div>
+          </div>
 
-            {{#each this.examples}}
-              <div class="row justify-content-center text-center">
-                <div class="col">
-                  <h4><i>{{this.usage}}</i></h4>
-                </div>
-              </div>
-            {{/each}}
+          {{#each this.examples}}
+          <div class="row justify-content-center text-center">
+            <div class="col">
+              <p style="font-size:20px;"><i>{{this.usage}}</i></p>
+            </div>
+          </div>
+          {{/each}}
+
           {{/if}}
         </div>
+        {{/each}}
       </div>
-      <br>
-      <br>
-      {{/each}}
     </div>
-  </body>
+
+
+  </div>
+</body>
+
 </html>
