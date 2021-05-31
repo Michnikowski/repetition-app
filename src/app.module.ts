@@ -9,9 +9,11 @@ import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { MywordsModule } from './mywords/mywords.module';
 import { RepetitionsModule } from './repetitions/repetitions.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ envFilePath: ['.env', '.env.e2e'] }),
     TypeOrmModule.forRoot({
       autoLoadEntities: true,
     }),
