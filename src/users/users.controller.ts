@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Render, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Render,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterDto } from './dto/register.dto';
 import { Response } from 'express';
@@ -13,6 +21,7 @@ export class UsersController {
     if (user) {
       return res.redirect('/users/login');
     } else {
+      res.status(HttpStatus.BAD_REQUEST);
       return res.render('register', { registerError: true });
     }
   }
