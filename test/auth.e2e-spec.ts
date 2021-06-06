@@ -1,16 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
-import { UsersModule } from 'src/users/users.module';
 import { getConnection } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { RegisterDto } from 'src/users/dto/register.dto';
 import * as request from 'supertest';
+import { join } from 'path';
+import * as hbs from 'hbs';
+import * as cookieParser from 'cookie-parser';
+import { ValidationPipe } from '@nestjs/common';
+import { createUser } from './factories/user.factory';
 
-describe('UsersController (e2e)', () => {
-  let app: INestApplication;
+describe('AuthController (e2e)', () => {
+  let app;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -29,11 +32,21 @@ describe('UsersController (e2e)', () => {
           autoLoadEntities: true,
         }),
         AuthModule,
-        UsersModule,
       ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    app.useStaticAssets(join(__dirname, '..', 'public'));
+    app.setBaseViewsDir(join(__dirname, '..', 'views'));
+    app.setViewEngine('hbs');
+    hbs.registerPartials(join(__dirname, '..', 'views/partials'));
+    hbs.registerHelper('replaceSpaces', function (input) {
+      return input.replace(' ', '');
+    });
+    app.useGlobalPipes(new ValidationPipe());
+    app.use(cookieParser());
+
     await app.init();
   });
 
@@ -42,33 +55,111 @@ describe('UsersController (e2e)', () => {
     await app.close();
   });
 
-  describe('#register', () => {
-    it('registers user', async () => {
-      const user: RegisterDto = {
-        firstName: 'Jon',
-        lastName: 'Doe',
-        email: 'Jon.Doe@email.com',
-        pwd: 'password',
-      };
+  describe('#login', () => {
+    it('login path correctness', async () => {
+      request(app.getHttpServer()).get('/users/login').expect(HttpStatus.OK);
+    });
 
-      const response = await request(app.getHttpServer())
-        .post('/users/register')
-        .set('Accept', 'application/json')
-        .send(user);
-
-      expect(response.status).toEqual(302);
-      expect(response.header.location).toEqual('/users/login');
-
-      const createdUser = await User.findOne({ email: 'Jon.Doe@email.com' });
-
-      //TODO: mock user password
-      expect(createdUser).toMatchObject({
-        firstName: 'Jon',
-        lastName: 'Doe',
-        email: 'Jon.Doe@email.com',
+    it('should login', async () => {
+      await createUser({
+        firstName: 'Obi',
+        lastName: 'Brown',
+        email: 'Obi.Brown@email.com',
         pwdHash:
           'c2c390685ac0295bc10ddc9538a5c69b380d5ced94604daa7cb875a9376563af5a80f5be5440ceb16bb4b1691411b1efea8f666b164c0b3c00cde7b706e6ae28',
       });
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .set('Accept', 'application/json')
+        .send({ email: 'Obi.Brown@email.com', pwd: 'password' });
+
+      expect(response.status).toEqual(HttpStatus.FOUND);
+      expect(response.header.location).toEqual('/');
+
+      const user = await User.findOne({ email: 'Obi.Brown@email.com' });
+
+      expect(user.currentTokenId).toBeTruthy;
+    });
+
+    it(`shouldn't login with wrong password`, async () => {
+      await createUser({
+        firstName: 'Ryan',
+        lastName: 'Dan',
+        email: 'Ryan.Dan@email.com',
+        pwdHash:
+          'c2c390685ac0295bc10ddc9538a5c69b380d5ced94604daa7cb875a9376563af5a80f5be5440ceb16bb4b1691411b1efea8f666b164c0b3c00cde7b706e6ae28',
+      });
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .set('Accept', 'application/json')
+        .send({ email: 'Ryan.Dan@email.com', pwd: 'wrongpassword' });
+
+      expect(response.status).toEqual(HttpStatus.BAD_REQUEST);
+
+      const user = await User.findOne({ email: 'Ryan.Dan@email.com' });
+
+      expect(user.currentTokenId).toBeFalsy;
+    });
+
+    it(`shouldn't login with wrong email`, async () => {
+      await createUser({
+        firstName: 'Mark',
+        lastName: 'White',
+        email: 'Mark.White@email.com',
+        pwdHash:
+          'c2c390685ac0295bc10ddc9538a5c69b380d5ced94604daa7cb875a9376563af5a80f5be5440ceb16bb4b1691411b1efea8f666b164c0b3c00cde7b706e6ae28',
+      });
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .set('Accept', 'application/json')
+        .send({ email: 'Mark.Brown@email.com', pwd: 'password' });
+
+      expect(response.status).toEqual(HttpStatus.BAD_REQUEST);
+
+      const user = await User.findOne({ email: 'Mark.White@email.com' });
+
+      expect(user.currentTokenId).toBeFalsy;
+    });
+
+    it(`shouldn't login with empty login and password`, async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .set('Accept', 'application/json')
+        .send({ email: '', pwd: '' });
+
+      expect(response.status).toEqual(HttpStatus.BAD_REQUEST);
+      expect(response.body).toMatchObject({
+        statusCode: 400,
+        message: ['email must be an email', 'pwd should not be empty'],
+        error: 'Bad Request',
+      });
+    });
+  });
+
+  describe('#logout', () => {
+    it('should logout user', async () => {
+      await createUser({
+        firstName: 'Linda',
+        lastName: 'Lopez',
+        email: 'Linda.Lopez@email.com',
+        pwdHash:
+          'c2c390685ac0295bc10ddc9538a5c69b380d5ced94604daa7cb875a9376563af5a80f5be5440ceb16bb4b1691411b1efea8f666b164c0b3c00cde7b706e6ae28',
+        currentTokenId: 'currenttokenid',
+      });
+
+      const responseLogout = await request(app.getHttpServer()).get(
+        '/auth/logout',
+      );
+
+      expect(responseLogout.status).toEqual(HttpStatus.FOUND);
+      expect(responseLogout.header.location).toEqual('/users/login');
+
+      const user = await User.findOne({ email: 'Linda.Lopez@email.com' });
+
+      expect(user.currentTokenId).toBeFalsy;
     });
   });
 });
