@@ -7,6 +7,8 @@ import * as hbs from 'hbs';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { UsersModule } from 'src/users/users.module';
+import { AppController } from 'src/app.controller';
+import { AppService } from 'src/app.service';
 
 export async function initApp() {
   let app;
@@ -28,6 +30,8 @@ export async function initApp() {
       UsersModule,
       AuthModule,
     ],
+    controllers: [AppController],
+    providers: [AppService],
   }).compile();
 
   app = moduleFixture.createNestApplication();
@@ -35,7 +39,7 @@ export async function initApp() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
-  hbs.registerPartials(join(__dirname, '..', 'views/partials'));
+  hbs.registerPartial('head', join(__dirname, '..', 'views/partials'));
   hbs.registerHelper('replaceSpaces', function (input) {
     return input.replace(' ', '');
   });
