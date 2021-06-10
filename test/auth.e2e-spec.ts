@@ -19,7 +19,9 @@ describe('AuthController (e2e)', () => {
 
   describe('#login', () => {
     it('login path correctness', async () => {
-      request(app.getHttpServer()).get('/users/login').expect(HttpStatus.OK);
+      const response = await request(app.getHttpServer()).get('/users/login');
+
+      expect(response.status).toBe(HttpStatus.OK);
     });
 
     it('should login', async () => {

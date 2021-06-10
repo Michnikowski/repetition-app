@@ -19,7 +19,11 @@ describe('UsersController (e2e)', () => {
 
   describe('#register', () => {
     it('registers path correctness', async () => {
-      request(app.getHttpServer()).get('/users/register').expect(HttpStatus.OK);
+      const response = await request(app.getHttpServer()).get(
+        '/users/register',
+      );
+
+      expect(response.status).toBe(HttpStatus.OK);
     });
 
     it('registers user', async () => {
