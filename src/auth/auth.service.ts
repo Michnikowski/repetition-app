@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { User } from 'src/users/entities/user.entity';
 import { hashPwd } from 'src/utils/hash-pwd';
@@ -43,10 +43,12 @@ export class AuthService {
       });
 
       if (!user) {
-        return res.render('login', { userError: true });
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .render('login', { userError: true });
       }
 
-      const token = await this.createToken(await this.generateToken(user));
+      const token = this.createToken(await this.generateToken(user));
 
       const log = new Log();
       log.actionDate = new Date();
@@ -62,7 +64,9 @@ export class AuthService {
         })
         .redirect('/');
     } catch (e) {
-      return res.render('login', { userError: true });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .render('login', { userError: true });
     }
   }
 

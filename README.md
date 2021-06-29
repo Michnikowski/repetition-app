@@ -51,6 +51,15 @@ $ npm run start:prod
 # unit tests
 $ npm run test
 
+# prepare e2e database
+psql -U postgres -c 'create database repetitionapp_test;'
+TYPEORM_CONNECTION=postgres
+TYPEORM_URL=postgres://postgres:password@localhost:5432/repetitionapp_test
+TYPEORM_ENTITIES=src/**/*.entity.ts
+yarn ts-node node_modules/.bin/typeorm schema:sync
+
+To drop the local database, you can use the command: schema:drop
+
 # e2e tests
 $ npm run test:e2e
 

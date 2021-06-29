@@ -1,7 +1,14 @@
-import { Controller, Get, Post, Body, Render, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Render,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterDto } from './dto/register.dto';
-import { RegisterUserResponse } from 'src/interfaces/user';
 import { Response } from 'express';
 
 @Controller('users')
@@ -9,11 +16,14 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('/register')
-  register(
-    @Body() newUser: RegisterDto,
-    @Res() res: Response,
-  ): Promise<RegisterUserResponse> {
-    return this.usersService.register(newUser, res);
+  async register(@Body() newUser: RegisterDto, @Res() res: Response) {
+    const user = await this.usersService.register(newUser);
+    if (user) {
+      return res.redirect('/users/login');
+    } else {
+      res.status(HttpStatus.BAD_REQUEST);
+      return res.render('register', { registerError: true });
+    }
   }
 
   @Get('/register')
